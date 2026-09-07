@@ -1,0 +1,1552 @@
+{
+  "Anatomy_and_Neuroanatomy_MBBS1.pdf": {
+    "filename": "Anatomy_and_Neuroanatomy_MBBS1.pdf",
+    "book_title": "Human Anatomy and Neuroanatomy Principles",
+    "subject": "Anatomy",
+    "mbbs_year": "MBBS 1st Year",
+    "chapters": [
+      {
+        "chapter_title": "Chapter 1: Musculoskeletal and Peripheral Nervous System",
+        "topics": [
+          {
+            "topic_title": "Brachial Plexus Organization and Neurological Lesions (Erb's and Klumpke's Palsy)",
+            "paragraphs": [
+              "The brachial plexus provides somatic nerve supply to the upper limb. It is formed by the anterior rami of cervical spinal nerves C5, C6, C7, C8, and T1. The plexus is organized anatomically from proximal to distal into five roots, three trunks (superior, middle, inferior), six divisions (three anterior, three posterior), three cords (lateral, posterior, medial named relative to the axillary artery), and terminal branches.",
+              "The superior trunk is formed by the union of C5 and C6 roots. An injury to Erb's point (the junction of C5 and C6) typically occurs during difficult vertex deliveries with excessive traction on the head or falls onto the shoulder. This produces Erb-Duchenne palsy, characterized clinically by the 'waiter's tip' or 'porter's tip' deformity. In this deformity, the arm hangs by the side in adduction and internal rotation, the elbow is extended, and the forearm is pronated.",
+              "Conversely, Klumpke's palsy involves avulsion of the inferior trunk (C8 and T1 nerve roots). This classic lesion arises from upward traction on the arm, such as when a person grabs a tree branch while falling or during breech deliveries. Paralysis affects intrinsic hand muscles supplied by T1, resulting in a claw hand accompanied by ipsilateral Horner syndrome due to interruption of sympathetic fibers."
+            ],
+            "pearl": "Erb's palsy affects C5-C6 (waiter's tip posture; loss of shoulder abductors and lateral rotators). Klumpke's affects C8-T1 (claw hand deformity and ipsilateral Horner syndrome).",
+            "table": {
+              "data": [
+                [
+                  "Lesion",
+                  "Roots Involved",
+                  "Clinical Posture",
+                  "Primary Mechanism"
+                ],
+                [
+                  "Erb's Palsy",
+                  "C5, C6",
+                  "Adducted, internally rotated shoulder, extended elbow, pronated forearm ('Waiter's tip')",
+                  "Shoulder dystocia, traction during delivery, fall on shoulder"
+                ],
+                [
+                  "Klumpke's Palsy",
+                  "C8, T1",
+                  "Intrinsic hand muscle paralysis, claw hand, loss of sensation on medial hand/forearm",
+                  "Breech delivery, upward traction from hanging onto tree limb"
+                ]
+              ]
+            }
+          },
+          {
+            "topic_title": "Carpal Tunnel Anatomy and Median Nerve Compression Syndrome",
+            "paragraphs": [
+              "The carpal tunnel is an osteofibrous canal located on the anterior aspect of the wrist. Its posterior and lateral boundaries are formed by the deep concave arch of carpal bones (scaphoid, trapezium, pisiform, and hook of hamate). Its anterior boundary is formed by the thick fibrous flexor retinaculum (transverse carpal ligament).",
+              "Ten structures pass through the carpal tunnel: four tendons of flexor digitorum superficialis, four tendons of flexor digitorum profundus, one tendon of flexor pollicis longus, and a single neural structure\u2014the median nerve. The median nerve lies superficial to the flexor tendons directly beneath the flexor retinaculum.",
+              "Compression of the median nerve produces Carpal Tunnel Syndrome (CTS). Patients present with paresthesia, burning pain, and numbness in the lateral three and a half digits (thumb, index, middle, and radial half of ring finger). Sensation over the thenar eminence is spared because the palmar cutaneous branch branches proximal to the flexor retinaculum and passes superficial to it."
+            ],
+            "pearl": "In Carpal Tunnel Syndrome, thenar sensation is preserved because the palmar cutaneous branch passes superficial to the flexor retinaculum.",
+            "table": {
+              "data": [
+                [
+                  "Feature",
+                  "Carpal Tunnel Syndrome Details"
+                ],
+                [
+                  "Boundary",
+                  "Carpal bones posteriorly; Flexor retinaculum anteriorly"
+                ],
+                [
+                  "Contents",
+                  "9 tendons (4 FDS, 4 FDP, 1 FPL) + Median Nerve"
+                ],
+                [
+                  "Provocative Tests",
+                  "Phalen test (wrist flexion 60s) and Tinel sign (percussion over retinaculum)"
+                ],
+                [
+                  "Motor Deficit",
+                  "Atrophy of thenar muscles (Abductor pollicis brevis, Flexor pollicis brevis, Opponens pollicis)"
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "chapter_title": "Chapter 2: Thorax, Cardiovascular and Neuroanatomy",
+        "topics": [
+          {
+            "topic_title": "Coronary Arterial Circulation, Territories and Cardiac Dominance",
+            "paragraphs": [
+              "The heart receives arterial blood supply through the right and left coronary arteries, arising from ascending aorta sinuses of Valsalva. The left coronary artery (LCA) bifurcates into the Left Anterior Descending (LAD) artery and the Left Circumflex (LCx) artery. The LAD supplies the anterior two-thirds of the interventricular septum, anterior LV wall, and cardiac apex ('widow-maker' artery).",
+              "Cardiac dominance is determined anatomically by which coronary artery gives off the Posterior Descending Artery (PDA). In 85% of individuals, the PDA arises from the Right Coronary Artery (RCA), termed right-dominant circulation. In 8-10%, the PDA arises from LCx (left-dominant). In the remaining patients, both contribute (codominant).",
+              "The RCA supplies the Sinoatrial (SA) node in ~60% and the Atrioventricular (AV) node in ~90% of individuals. Consequently, acute inferior wall myocardial infarctions caused by acute RCA occlusion frequently precipitate sinus bradycardia, sinus arrest, and high-degree AV block."
+            ],
+            "pearl": "Right dominance accounts for ~85% of individuals; RCA supplies the AV node via the AV nodal artery, making inferior wall MI frequently complicated by AV nodal conduction block.",
+            "table": {
+              "data": [
+                [
+                  "Artery",
+                  "Main Branches",
+                  "Territory Supplied",
+                  "Common Clinical Complication"
+                ],
+                [
+                  "LAD (Left Anterior Descending)",
+                  "Diagonal branches, septal perforators",
+                  "Anterior LV wall, anterior 2/3 of septum, apex",
+                  "Anterior STEMI, cardiogenic shock, bundle branch block"
+                ],
+                [
+                  "RCA (Right Coronary Artery)",
+                  "Marginal artery, PDA (in 85%), AV nodal artery",
+                  "Right ventricle, inferior LV wall, posterior 1/3 septum, SA/AV nodes",
+                  "Inferior STEMI (leads II, III, aVF), bradycardia, 3rd degree AV block"
+                ],
+                [
+                  "LCx (Left Circumflex)",
+                  "Obtuse marginal branches",
+                  "Lateral and posterior walls of left ventricle",
+                  "Lateral STEMI (leads I, aVL, V5-V6)"
+                ]
+              ]
+            }
+          },
+          {
+            "topic_title": "Cranial Nerves and Brainstem Stroke Localization Syndromes",
+            "paragraphs": [
+              "Twelve pairs of cranial nerves emerge from the brain. Localization within the brainstem follows the 'rule of 4s': CN I and II emerge from the forebrain; CN III and IV exit the midbrain; CN V, VI, VII, and VIII emerge from the pons or pontomedullary junction; and CN IX, X, XI, and XII exit the medulla oblongata.",
+              "Cranial nerve III (Oculomotor nerve) innervates ocular muscles and provides parasympathetic pupillary constriction via Edinger-Westphal nucleus. In uncal herniation, the temporal uncus compresses CN III against the petroclinoid ligament, causing an ipsilateral 'blown pupil' followed by 'down and out' globe displacement.",
+              "Cranial nerve VII (Facial nerve) controls facial expression. In upper motor neuron (UMN) lesions (stroke), the forehead is spared due to bilateral cortical innervation. In lower motor neuron (LMN) lesions (Bell's palsy), both upper and lower face are paralyzed on the ipsilateral side, impairing eye closure and forehead wrinkling."
+            ],
+            "pearl": "Forehead sparing distinguishes UMN facial weakness (cortical stroke) from LMN facial paralysis (Bell's palsy), where the entire ipsilateral hemiface is involved.",
+            "table": {
+              "data": [
+                [
+                  "Lesion Type",
+                  "Forehead Involvement",
+                  "Blink Reflex / Eye Closure",
+                  "Etiology Example"
+                ],
+                [
+                  "UMN Facial Palsy",
+                  "Spared (bilateral corticobulbar innervation)",
+                  "Intact or minimally affected",
+                  "Contralateral MCA ischemic stroke"
+                ],
+                [
+                  "LMN Facial Palsy (Bell's)",
+                  "Paralyzed (loss of wrinkling)",
+                  "Impaired (inability to close eye, Bell's phenomenon)",
+                  "HSV-1 reactivation, Lyme disease, Ramsay Hunt syndrome"
+                ]
+              ]
+            }
+          },
+          {
+            "topic_title": "Meninges, Subarachnoid Space, CSF Circulation, and Lumbar Puncture Anatomy",
+            "paragraphs": [
+              "The central nervous system is enveloped by three meningeal layers: the outer tough Dura Mater (pachymeninx), the middle delicate Arachnoid Mater, and the inner vascular Pia Mater intimately adhering to the brain and spinal cord parenchyma. The Pia and Arachnoid together constitute the Leptomeninges, which become acutely inflamed in meningitis.",
+              "The Subarachnoid Space lies between the arachnoid and pia mater and contains approximately 150 mL of Cerebrospinal Fluid (CSF). The spinal cord terminates at the conus medullaris at the L1-L2 vertebral body level in adults (L3 in neonates). Below this level, the subarachnoid space expands into the Lumbar Cistern containing the cauda equina, extending to the second sacral vertebra (S2).",
+              "Lumbar puncture (LP) is performed at the L3-L4 or L4-L5 intervertebral interspace (identified by Tuffier's line connecting the highest points of the iliac crests). The spinal needle penetrates sequentially: skin, subcutaneous tissue, supraspinous ligament, interspinous ligament, ligamentum flavum ('pop' sensation), epidural space, dura mater, and arachnoid mater into the subarachnoid space."
+            ],
+            "pearl": "Lumbar puncture enters the subarachnoid space at L3-L4 or L4-L5, below the conus medullaris (L1-L2), safely traversing the ligamentum flavum and dura-arachnoid without injuring the spinal cord.",
+            "table": {
+              "data": [
+                [
+                  "Layer Traversed in LP",
+                  "Anatomical Characteristic",
+                  "Clinical Significance"
+                ],
+                [
+                  "Supraspinous / Interspinous",
+                  "Fibrous longitudinal midline ligaments",
+                  "Provides resistance and needle guidance"
+                ],
+                [
+                  "Ligamentum Flavum",
+                  "Thick, elastic yellow ligament connecting laminae",
+                  "Distinct tactile 'pop' felt upon needle penetration"
+                ],
+                [
+                  "Dura Mater & Arachnoid",
+                  "Tough fibrous sheath enclosing subarachnoid space",
+                  "Second tactile 'give'; CSF flows upon stylet withdrawal"
+                ],
+                [
+                  "Subarachnoid Cistern",
+                  "CSF-filled cavity containing cauda equina roots",
+                  "Target site for opening pressure and diagnostic CSF collection"
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "Medical_Physiology_Guyton_Principles_MBBS1.pdf": {
+    "filename": "Medical_Physiology_Guyton_Principles_MBBS1.pdf",
+    "book_title": "Textbook of Medical Physiology: Guyton Principles",
+    "subject": "Physiology",
+    "mbbs_year": "MBBS 1st Year",
+    "chapters": [
+      {
+        "chapter_title": "Chapter 1: Cardiac Electrophysiology, Hemodynamics and Blood-Brain Barrier",
+        "topics": [
+          {
+            "topic_title": "Phases of the Cardiac Cycle, Pressure-Volume Loops and Wiggers Diagram",
+            "paragraphs": [
+              "The cardiac cycle consists of mechanical and electrical events from one heartbeat to the next. At resting heart rate 75 bpm, each cycle lasts 0.8s (systole 0.3s; diastole 0.5s). Phase 1 is Isovolumetric Contraction: rising ventricular pressure abruptly closes AV valves (mitral/tricuspid), producing the First Heart Sound (S1). All valves remain closed; ventricular volume stays at End-Diastolic Volume (EDV, ~120 mL).",
+              "Phase 2 is Rapid Ventricular Ejection: LV pressure exceeds aortic diastolic pressure (~80 mmHg), opening the aortic valve and rapidly ejecting two-thirds of stroke volume. Phase 3 is Reduced Ejection. Phase 4 is Isovolumetric Relaxation: falling ventricular pressure below aortic pressure leads to abrupt aortic valve closure, generating the Second Heart Sound (S2) and dicrotic notch at End-Systolic Volume (ESV, ~50 mL).",
+              "Phase 5 is Rapid Ventricular Filling: AV valves open as ventricular pressure falls below atrial pressure. Rapid passive inflow accounts for 70-80% of ventricular filling. Rush of blood into a stiff or volume-overloaded ventricle produces a Third Heart Sound (S3), hallmark of heart failure."
+            ],
+            "pearl": "S1 corresponds to AV valve closure at onset of isovolumetric contraction; S2 corresponds to semilunar valve closure at onset of isovolumetric relaxation. The Wiggers diagram synchronizes ECG, pressures, volumes, and heart sounds.",
+            "table": {
+              "data": [
+                [
+                  "Phase",
+                  "Mitral / Tricuspid Valve",
+                  "Aortic / Pulmonic Valve",
+                  "Ventricular Volume",
+                  "Acoustic Event"
+                ],
+                [
+                  "Isovolumetric Contraction",
+                  "Closed",
+                  "Closed",
+                  "Constant at EDV (~120 mL)",
+                  "S1 ('lub')"
+                ],
+                [
+                  "Rapid Ejection",
+                  "Closed",
+                  "Open",
+                  "Rapidly Decreasing",
+                  "Silent"
+                ],
+                [
+                  "Isovolumetric Relaxation",
+                  "Closed",
+                  "Closed",
+                  "Constant at ESV (~50 mL)",
+                  "S2 ('dub') + Dicrotic notch"
+                ],
+                [
+                  "Rapid Filling",
+                  "Open",
+                  "Closed",
+                  "Rapidly Increasing",
+                  "S3 if pathological volume overload"
+                ]
+              ]
+            }
+          },
+          {
+            "topic_title": "Determinants of Cardiac Output, Frank-Starling Law and Hemodynamics",
+            "paragraphs": [
+              "Cardiac Output (CO) is the volume of blood pumped per minute: CO = Stroke Volume (SV) * Heart Rate (HR), averaging 5.0 L/min in adults. Stroke volume is governed by three factors: Preload, Afterload, and Inotropism (contractility).",
+              "The Frank-Starling Law states that within physiological limits, ventricular contraction force is proportional to initial resting length of muscle fibers. Increased venous return increases EDV (preload), stretching myocardial sarcomeres toward optimal actin-myosin overlap (~2.2 micrometers). This enhances troponin C affinity for calcium, generating greater stroke volume.",
+              "Afterload represents the tension or resistance against which the ventricle must contract to eject blood (approximated by Mean Arterial Pressure and Systemic Vascular Resistance). Elevated afterload in hypertension or aortic stenosis decreases stroke volume and increases myocardial oxygen consumption."
+            ],
+            "pearl": "The Frank-Starling mechanism matches the output of the right and left ventricles on a beat-to-beat basis, maintaining systemic and pulmonary circulation balance.",
+            "table": {
+              "data": [
+                [
+                  "Determinant",
+                  "Physiological Definition",
+                  "Effect on Stroke Volume",
+                  "Clinical Modulator"
+                ],
+                [
+                  "Preload",
+                  "End-diastolic wall tension / EDV",
+                  "Increased preload increases SV (Frank-Starling)",
+                  "IV fluids, venous tone, nitrates (decrease)"
+                ],
+                [
+                  "Afterload",
+                  "Resistance against ventricular ejection",
+                  "Increased afterload decreases SV",
+                  "Systemic vascular resistance, ACE inhibitors, hydralazine"
+                ],
+                [
+                  "Contractility",
+                  "Inherent inotropic state at given EDV",
+                  "Increased inotropy increases SV",
+                  "Digoxin, dobutamine, sympathetic catecholamines"
+                ]
+              ]
+            }
+          },
+          {
+            "topic_title": "Cerebrospinal Fluid (CSF) Secretion, Blood-Brain Barrier and Intracranial Dynamics",
+            "paragraphs": [
+              "Cerebrospinal Fluid (CSF) is an ultrafiltrate of plasma produced primarily by the Choroid Plexuses in the lateral, third, and fourth ventricles at ~0.35 mL/min (~500 mL/day). Total normal CSF volume is approximately 150 mL (renewed 3-4 times daily). CSF flows from lateral ventricles through the foramina of Monro into the third ventricle, cerebral aqueduct of Sylvius, fourth ventricle, and exits via foramina of Luschka and Magendie into the subarachnoid space.",
+              "CSF is reabsorbed into the venous circulation via Arachnoid Granulations projecting into the Superior Sagittal Sinus. Normal CSF opening pressure in the lateral decubitus position is 80 to 200 mm H2O. The Blood-Brain Barrier (BBB) is formed by non-fenestrated capillary endothelial cells joined by tight junctions (zonula occludens), supported by pericytes and astrocyte end-feet (astrocytic glia limitans).",
+              "In acute bacterial meningitis, bacterial endotoxins and inflammatory cytokines (TNF-alpha, IL-1beta) destroy endothelial tight junctions, causing profound BBB breakdown. Protein and fluid pour into the cerebral parenchyma, generating vasogenic and cytotoxic cerebral edema that dramatically spikes intracranial pressure according to the Monro-Kellie doctrine."
+            ],
+            "pearl": "The Blood-Brain Barrier consists of endothelial tight junctions, pericytes, and astrocytic end-feet. Disruption in bacterial meningitis causes vasogenic cerebral edema and marked elevation of opening pressure (>250 mm H2O).",
+            "table": {
+              "data": [
+                [
+                  "Parameter",
+                  "Normal CSF Value",
+                  "Pathological Shift in Bacterial Meningitis"
+                ],
+                [
+                  "Total Volume / Turnover",
+                  "150 mL (turnover ~3-4x daily)",
+                  "Normal volume but obstructed reabsorption elevates ICP"
+                ],
+                [
+                  "Opening Pressure",
+                  "80 - 200 mm H2O",
+                  "Markedly elevated (> 250 - 400 mm H2O)"
+                ],
+                [
+                  "Blood-Brain Barrier Integrity",
+                  "Strictly impermeable to large molecules/proteins",
+                  "Severe disruption; massive leak of serum albumin and cytokines"
+                ],
+                [
+                  "CSF Secretion Rate",
+                  "0.35 mL/min (~500 mL/day)",
+                  "Sustained secretion despite obstructed arachnoid villi"
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "chapter_title": "Chapter 2: Respiratory and Renal Physiology",
+        "topics": [
+          {
+            "topic_title": "Oxygen-Hemoglobin Dissociation Curve, Bohr and Haldane Effects",
+            "paragraphs": [
+              "Hemoglobin reversibly binds four oxygen molecules, yielding a sigmoidal Oxygen-Hemoglobin Dissociation Curve. P50 is the PaO2 at 50% saturation, normally ~26.8 mmHg under standard physiological conditions (pH 7.40, temp 37\u00b0C, PaCO2 40 mmHg).",
+              "A Rightward Shift indicates decreased hemoglobin affinity for oxygen, facilitating oxygen unloading at tissues. Causes include acidosis (decreased pH), elevated PaCO2 (Bohr Effect), hyperthermia, and increased 2,3-bisphosphoglycerate (2,3-BPG).",
+              "A Leftward Shift reflects increased affinity of hemoglobin for oxygen, impeding tissue release. Causes include alkalosis, hypothermia, decreased 2,3-BPG, fetal hemoglobin (HbF), and carboxyhemoglobin (carbon monoxide poisoning locking Hb in the high-affinity R state)."
+            ],
+            "pearl": "Remember: CADET face right! CO2, Acidosis, 2,3-DPG, Exercise, Temperature all shift the curve to the RIGHT, facilitating oxygen unloading to hypoxic tissues.",
+            "table": {
+              "data": [
+                [
+                  "Direction",
+                  "Affinity for O2",
+                  "P50 Value",
+                  "Precipitating Factors"
+                ],
+                [
+                  "Right Shift",
+                  "Decreased (unloading favored)",
+                  "Increased (>27 mmHg)",
+                  "Increased H+ (acidosis), high CO2 (Bohr), elevated 2,3-BPG, fever, strenuous exercise"
+                ],
+                [
+                  "Left Shift",
+                  "Decreased tissue unloading",
+                  "Decreased (<26 mmHg)",
+                  "Decreased H+ (alkalosis), low CO2, low 2,3-BPG, hypothermia, Fetal Hb (HbF), Carbon monoxide"
+                ]
+              ]
+            }
+          },
+          {
+            "topic_title": "Glomerular Filtration Rate (GFR) Dynamics and Countercurrent System",
+            "paragraphs": [
+              "Glomerular Filtration Rate (GFR) averages 125 mL/min (180 L/day). It is governed by Starling forces: GFR = Kf * [(Pgc - Pbs) - (pi_gc - pi_bs)]. Hydrostatic pressure in glomerular capillaries (Pgc ~55 mmHg) is the primary driver promoting filtration.",
+              "Renal clearance measures plasma volume cleared of a substance per minute: Cx = (Ux * V) / Px. Inulin clearance is the gold-standard measure because it is freely filtered without tubular reabsorption or secretion. Creatinine clearance serves as the clinical surrogate.",
+              "The countercurrent multiplier system in the loop of Henle establishes a hyperosmolar medullary interstitium (up to 1200 mOsm/kg). The thin descending limb is permeable to water but impermeable to solutes, whereas the thick ascending limb actively pumps Na+, K+, 2Cl- via NKCC2 cotransporter impermeable to water."
+            ],
+            "pearl": "Inulin clearance equals GFR (neither secreted nor reabsorbed); PAH clearance estimates Effective Renal Plasma Flow (ERPF) due to near-complete tubular secretion.",
+            "table": {
+              "data": [
+                [
+                  "Substance",
+                  "Tubular Handling",
+                  "Clearance Relation to GFR",
+                  "Clinical Diagnostic Role"
+                ],
+                [
+                  "Inulin",
+                  "Freely filtered, 0% reabsorbed, 0% secreted",
+                  "Clearance = GFR",
+                  "Gold standard research measure of GFR"
+                ],
+                [
+                  "Creatinine",
+                  "Freely filtered, slightly secreted (~10-15%)",
+                  "Clearance slightly overestimates GFR",
+                  "Everyday clinical biomarker for kidney function"
+                ],
+                [
+                  "Glucose",
+                  "Freely filtered, 100% reabsorbed in PCT (below Tm)",
+                  "Clearance = 0 mL/min (normally)",
+                  "Glycosuria occurs when filtered load exceeds Tm (~375 mg/min)"
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "General_and_Systemic_Pathology_Robbins_MBBS2.pdf": {
+    "filename": "General_and_Systemic_Pathology_Robbins_MBBS2.pdf",
+    "book_title": "Pathologic Basis of Disease: Robbins Principles",
+    "subject": "Pathology",
+    "mbbs_year": "MBBS 2nd Year",
+    "chapters": [
+      {
+        "chapter_title": "Chapter 1: Cellular Injury, Inflammation and Hemodynamics",
+        "topics": [
+          {
+            "topic_title": "Patterns of Tissue Necrosis vs Programmed Apoptosis Mechanisms",
+            "paragraphs": [
+              "Cell death is divided into Necrosis (always pathological, with cell swelling, membrane rupture, and inflammatory response) and Apoptosis (programmed, energy-dependent cell death occurring physiologically or pathologically without inflammation).",
+              "Necrosis morphological patterns include: (1) Coagulative necrosis in ischemic solid organ infarcts (heart, kidney) where architecture is preserved for days with ghost cells lacking nuclei; (2) Liquefactive necrosis in CNS hypoxic injury (brain infarcts) and focal bacterial abscesses where enzymes rapidly digest dead cells into liquid viscous pus; (3) Caseous necrosis in tuberculous granulomas with cheesy friable debris surrounded by Langhans giant cells; (4) Enzymatic fat necrosis in pancreatitis where lipases form chalky calcium soaps.",
+              "Apoptosis occurs via the Intrinsic (Mitochondrial) and Extrinsic (Death Receptor) pathways. The intrinsic pathway is triggered by DNA damage or growth factor loss, activating BAX/BAK, releasing Cytochrome c into cytosol, forming the apoptosome with APAF-1, and activating executioner caspase-3 and caspase-7."
+            ],
+            "pearl": "Coagulative necrosis preserves cell outlines (ghost cells) in all organs except the brain, which undergoes liquefactive necrosis due to abundant hydrolytic enzymes and high lipid content.",
+            "table": {
+              "data": [
+                [
+                  "Pattern",
+                  "Histologic Hallmark",
+                  "Classic Organs / Conditions",
+                  "Key Pathogenesis"
+                ],
+                [
+                  "Coagulative Necrosis",
+                  "Preserved tissue architecture, ghost cells lacking nuclei",
+                  "Myocardial infarction, renal cortical infarct, splenic infarct",
+                  "Denaturation of structural proteins and enzymes by severe acidosis"
+                ],
+                [
+                  "Liquefactive Necrosis",
+                  "Total enzymatic dissolution, cystic cavity formation",
+                  "Brain ischemic strokes, abscesses",
+                  "Hydrolytic release by lysosomal enzymes and neutrophilic degranulation"
+                ],
+                [
+                  "Caseous Necrosis",
+                  "Acellular pink amorphous debris, Langhans giant cells",
+                  "Mycobacterium tuberculosis, fungal granulomas",
+                  "Delayed-type IV hypersensitivity response to mycobacterial lipids"
+                ],
+                [
+                  "Fat Necrosis",
+                  "Shadowy necrotic adipocytes, chalky calcium saponification",
+                  "Acute pancreatitis, traumatic breast injury",
+                  "Pancreatic lipase digestion of adipose tissue forming calcium soaps"
+                ]
+              ]
+            }
+          },
+          {
+            "topic_title": "Acute and Chronic Inflammation: Hemodynamics and Leukocyte Cascade",
+            "paragraphs": [
+              "Acute inflammation delivers leukocytes and plasma proteins to injury sites. It comprises vascular reactions and cellular events. Vascular changes begin with transient arteriolar vasoconstriction followed by sustained vasodilation mediated by histamine and nitric oxide, producing rubor and calor.",
+              "Microvascular permeability increases through endothelial retraction induced by histamine, bradykinin, and leukotrienes, generating protein-rich exudate (specific gravity > 1.020) causing edema (tumor).",
+              "The cellular phase follows a leukocyte cascade: (1) Margination and rolling along endothelium via Selectins (L-selectin on neutrophils, E- and P-selectin on endothelium binding Sialyl-Lewis X); (2) Firm adhesion mediated by Beta-2 Integrins (LFA-1, Mac-1 binding ICAM-1); (3) Transmigration (diapedesis) via PECAM-1 (CD31); (4) Chemotaxis along gradients (C5a, LTB4, IL-8)."
+            ],
+            "pearl": "Rolling is mediated by Selectins; Firm Adhesion is mediated by Integrins (CD11/CD18) binding ICAM-1. Leukocyte Adhesion Deficiency Type 1 (LAD-1) is caused by a defect in the CD18 beta-2 integrin subunit.",
+            "table": {
+              "data": [
+                [
+                  "Step",
+                  "Leukocyte Molecule",
+                  "Endothelial Counter-Receptor",
+                  "Clinical Defect"
+                ],
+                [
+                  "Rolling",
+                  "Sialyl-Lewis X (CD15s)",
+                  "P-selectin (Weibel-Palade bodies), E-selectin",
+                  "Leukocyte Adhesion Deficiency Type 2 (fucose defect)"
+                ],
+                [
+                  "Firm Adhesion",
+                  "Beta-2 Integrins (LFA-1, Mac-1 / CD11a/b-CD18)",
+                  "ICAM-1 (CD54), VCAM-1",
+                  "Leukocyte Adhesion Deficiency Type 1 (delayed umbilical separation)"
+                ],
+                [
+                  "Diapedesis",
+                  "PECAM-1 (CD31)",
+                  "PECAM-1 (CD31)",
+                  "Transendothelial migration arrest"
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "chapter_title": "Chapter 2: Cardiovascular, Renal and Neuropathology",
+        "topics": [
+          {
+            "topic_title": "Pathogenesis of Atherosclerosis and Histopathology of Myocardial Infarction",
+            "paragraphs": [
+              "Atherosclerosis is a chronic inflammatory disorder of large/medium arteries initiated by endothelial injury. The 'response to injury' hypothesis details how chronic hyperlipidemia causes endothelial dysfunction, oxidized LDL accumulation in the intima, monocyte recruitment via VCAM-1, and macrophage foam cell formation.",
+              "Growth factors (PDGF, FGF) stimulate smooth muscle migration from media to intima, depositing collagen to form a fibrous cap. Plaque rupture exposes thrombogenic subendothelial collagen, triggering occlusive luminal thrombosis and acute myocardial infarction.",
+              "Histopathology of MI progresses temporally: At 0-4 hours, no light microscopic changes; at 4-12 hours, wavy fibers and early coagulation necrosis; at 12-24 hours, contraction band necrosis and hypereosinophilia; at 1-3 days, dense neutrophilic infiltrate and loss of nuclei; at 3-7 days, macrophage infiltration and dead myocyte phagocytosis (highest risk of ventricular wall rupture); at 1-2 weeks, vascular granulation tissue; at >2 months, dense collagenous fibrotic scar."
+            ],
+            "pearl": "Highest risk of myocardial rupture (ventricular free wall, septum, or papillary muscle) occurs at 3-7 days post-MI due to maximal macrophage infiltration and collagen lysis.",
+            "table": {
+              "data": [
+                [
+                  "Time Post-MI",
+                  "Gross Appearance",
+                  "Light Microscopy Hallmarks",
+                  "Clinical Complication"
+                ],
+                [
+                  "0 to 4 hours",
+                  "No gross change",
+                  "Minimal wavy myocardial fibers",
+                  "Lethal ventricular arrhythmias (VF/VT)"
+                ],
+                [
+                  "4 to 24 hours",
+                  "Dark mottling",
+                  "Coagulative necrosis, contraction bands, early PMNs",
+                  "Cardiogenic shock, arrhythmia"
+                ],
+                [
+                  "1 to 3 days",
+                  "Mottling with yellow-tan infarct center",
+                  "Loss of nuclei, heavy neutrophilic infiltrate",
+                  "Fibrinous pericarditis (friction rub)"
+                ],
+                [
+                  "3 to 7 days",
+                  "Hyperemic border with central softening",
+                  "Macrophage phagocytosis of necrotic debris",
+                  "Free wall rupture, VSD, acute mitral regurgitation"
+                ],
+                [
+                  "1 to 2 weeks",
+                  "Red-gray depressed borders",
+                  "Granulation tissue with neovascularization",
+                  "Ventricular aneurysm formation"
+                ]
+              ]
+            }
+          },
+          {
+            "topic_title": "Neuropathology of Central Nervous System Infections: Suppurative Leptomeningitis and Viral Encephalitis",
+            "paragraphs": [
+              "Acute Pyogenic (Suppurative) Meningitis is characterized by exudation in the leptomeninges over the cerebral hemispheres and base of the brain. Gross examination reveals engorged meningeal vessels and thick, creamy purulent exudate within the subarachnoid space (predominantly over convexity in S. pneumoniae and at base of brain in H. influenzae).",
+              "Microscopically, neutrophils fill the subarachnoid space, concentrated around leptomeningeal blood vessels. Inflammation may extend along Virchow-Robin perivascular spaces into superficial cortex, but direct parenchymal invasion is limited. Leptomeningeal phlebitis can cause venous thrombosis and hemorrhagic cerebral infarction.",
+              "In Tuberculous Meningitis, gelatinous fibrinous exudate coats the base of the brain (basilar meningitis), entrapping cranial nerves (especially CN III, IV, VI). Microscopically, caseating granulomas with Langhans giant cells and obliterative endarteritis are prominent. Viral (Aseptic) Meningitis shows mild leptomeningeal lymphocytic infiltrate without purulent exudate."
+            ],
+            "pearl": "Suppurative bacterial meningitis produces dense neutrophilic exudate in the subarachnoid space; Tuberculous meningitis characteristically causes thick gelatinous basilar exudate with cranial nerve entrapment.",
+            "table": {
+              "data": [
+                [
+                  "Etiologic Class",
+                  "Gross Neuropathology",
+                  "Histological Hallmark",
+                  "Predominant Location"
+                ],
+                [
+                  "Acute Pyogenic Meningitis",
+                  "Thick purulent yellowish-green exudate, engorged vessels",
+                  "Dense neutrophilic pleocytosis in subarachnoid space",
+                  "Convexity (S. pneumoniae) / Base (H. influenzae)"
+                ],
+                [
+                  "Tuberculous Meningitis",
+                  "Thick gelatinous grayish-green basilar exudate",
+                  "Caseating granulomas, Langhans giant cells, endarteritis",
+                  "Base of the brain, circle of Willis, cranial nerve roots"
+                ],
+                [
+                  "Viral (Aseptic) Meningitis",
+                  "Mild brain swelling, normal or cloudy leptomeninges",
+                  "Mild-to-moderate perivascular lymphocytic cuffing",
+                  "Diffuse leptomeninges without parenchymal necrosis"
+                ],
+                [
+                  "Fungal (Cryptococcal)",
+                  "Mucoid gelatinous 'soap-bubble' cysts in basal ganglia",
+                  "Encapsulated yeast cells positive on mucicarmine and India ink",
+                  "Virchow-Robin spaces and basal subarachnoid space"
+                ]
+              ]
+            }
+          },
+          {
+            "topic_title": "Glomerular Diseases: Nephrotic vs Nephritic Syndromes Pathophysiology",
+            "paragraphs": [
+              "Glomerular diseases present as either Nephrotic Syndrome or Nephritic Syndrome. Nephrotic syndrome is defined by massive proteinuria (> 3.5 g/24h), hypoalbuminemia (< 3.0 g/dL), generalized edema (anasarca), and hyperlipidemia with lipiduria.",
+              "Pathogenesis involves podocyte foot process effacement destroying the negative charge barrier. Prototypes: (1) Minimal Change Disease (most common in children, normal light microscopy, podocyte effacement on electron microscopy, excellent response to corticosteroids); (2) Focal Segmental Glomerulosclerosis (FSGS, sclerosis in subsets of glomeruli, common in HIV, African ancestry); (3) Membranous Nephropathy (subepithelial immune deposits with 'spike and dome' pattern).",
+              "Nephritic syndrome features hematuria with dysmorphic RBCs and RBC casts, oliguria, azotemia, and hypertension. Prototype: Poststreptococcal Glomerulonephritis (PSGN), occurring 1-4 weeks post-streptococcal pharyngitis or impetigo, showing hypercellular glomeruli and subepithelial 'humps' on EM."
+            ],
+            "pearl": "Nephrotic syndrome = Podocyte effacement with massive proteinuria (>3.5g/day) and bland urine sediment. Nephritic syndrome = Glomerular inflammation with hematuria, dysmorphic RBCs, and RBC casts.",
+            "table": {
+              "data": [
+                [
+                  "Parameter",
+                  "Nephrotic Syndrome",
+                  "Nephritic Syndrome"
+                ],
+                [
+                  "Primary Mechanism",
+                  "Podocyte injury, filtration slit breakdown",
+                  "Inflammatory glomerular capillary wall destruction"
+                ],
+                [
+                  "Proteinuria",
+                  "Massive (> 3.5 g / 24 hours)",
+                  "Sub-nephrotic (< 3.5 g / 24 hours)"
+                ],
+                [
+                  "Hematuria",
+                  "Absent or microscopic",
+                  "Prominent (smoky / cola-colored, RBC casts)"
+                ],
+                [
+                  "Edema Mechanism",
+                  "Hypoalbuminemia reducing oncotic pressure",
+                  "Renal sodium and water retention from low GFR"
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "Medical_Pharmacology_Tripathi_Principles_MBBS2.pdf": {
+    "filename": "Medical_Pharmacology_Tripathi_Principles_MBBS2.pdf",
+    "book_title": "Essentials of Medical Pharmacology: Tripathi Principles",
+    "subject": "Pharmacology",
+    "mbbs_year": "MBBS 2nd Year",
+    "chapters": [
+      {
+        "chapter_title": "Chapter 1: Cardiovascular Pharmacology and Autonomics",
+        "topics": [
+          {
+            "topic_title": "RAAS Inhibitors: ACE Inhibitors, ARBs and Adverse Effect Profiles",
+            "paragraphs": [
+              "Angiotensin-Converting Enzyme (ACE) Inhibitors (Enalapril, Lisinopril, Ramipril) competitively inhibit conversion of Angiotensin I to Angiotensin II. They decrease afterload, suppress aldosterone secretion, and dilate efferent glomerular arterioles, reducing intraglomerular pressure in diabetic nephropathy.",
+              "A landmark adverse effect of ACE inhibitors is intractable dry cough in 10-20% of patients. ACE is identical to kininase II, responsible for degrading bradykinin and substance P. Inhibition causes bradykinin accumulation in the bronchial mucosa, triggering cough.",
+              "Angiotensin Receptor Blockers (ARBs: Losartan, Telmisartan) competitively block AT1 receptors without inhibiting ACE/kininase II. Thus, ARBs do not elevate bradykinin and are the drug of choice when ACEi cough develops. Both agents can cause hyperkalemia and are strictly contraindicated in pregnancy (fetal renal dysgenesis)."
+            ],
+            "pearl": "ACE inhibitor dry cough is mediated by bradykinin accumulation due to kininase II inhibition. Switching to an ARB (Losartan) eliminates cough because ARBs do not block bradykinin breakdown.",
+            "table": {
+              "data": [
+                [
+                  "Drug Class",
+                  "Mechanism of Action",
+                  "Bradykinin Level",
+                  "Key Adverse Effects",
+                  "Pregnancy Safety"
+                ],
+                [
+                  "ACE Inhibitors (Enalapril, Ramipril)",
+                  "Competitive inhibition of ACE (kininase II)",
+                  "Elevated (causes dry cough & angioedema)",
+                  "Dry cough, angioedema, hyperkalemia, acute kidney injury in bilateral renal artery stenosis",
+                  "Category D / Contraindicated (renal dysgenesis)"
+                ],
+                [
+                  "ARBs (Losartan, Valsartan)",
+                  "Selective competitive antagonism of AT1 receptors",
+                  "Unchanged / Normal (no cough)",
+                  "Hyperkalemia, hypotension, dizziness, acute renal impairment in renal artery stenosis",
+                  "Category D / Contraindicated (fetal toxicity)"
+                ]
+              ]
+            }
+          },
+          {
+            "topic_title": "Beta-Adrenergic Antagonists: Receptor Selectivity and Overdose Management",
+            "paragraphs": [
+              "Beta-blockers are classified by receptor selectivity: (1) Non-selective (Propranolol, Timolol) block beta-1 and beta-2; (2) Cardioselective beta-1 (Metoprolol, Bisoprolol, Atenolol, Esmolol) block cardiac beta-1 receptors; (3) Mixed alpha-1 and beta blockers (Carvedilol, Labetalol) produce peripheral vasodilation and cardiac blockade.",
+              "Cardioselective agents reduce heart rate, myocardial contractility, and renin release. However, selectivity is lost at high doses, risking severe bronchospasm in asthma/COPD due to beta-2 blockade.",
+              "Beta-blocker overdose causes severe bradycardia, cardiogenic shock, heart block, and hypoglycemia. The specific antidote is intravenous Glucagon. Glucagon binds myocardial glucagon receptors coupled to Gs, bypassing blocked beta receptors to increase intracellular cAMP, restoring inotropy and chronotropy."
+            ],
+            "pearl": "Glucagon is the first-line antidote for beta-blocker overdose because it activates adenylate cyclase and cAMP independent of beta-adrenergic receptors.",
+            "table": {
+              "data": [
+                [
+                  "Drug",
+                  "Receptor Target",
+                  "Cardioselectivity",
+                  "Special Clinical Role"
+                ],
+                [
+                  "Metoprolol / Bisoprolol",
+                  "Beta-1 >> Beta-2",
+                  "Cardioselective",
+                  "First-line in post-MI and HFrEF; less bronchospasm risk"
+                ],
+                [
+                  "Propranolol",
+                  "Beta-1 = Beta-2",
+                  "Non-selective",
+                  "Thyroid storm, essential tremor, migraine prophylaxis"
+                ],
+                [
+                  "Carvedilol / Labetalol",
+                  "Beta-1, Beta-2, Alpha-1",
+                  "Mixed antagonist",
+                  "Carvedilol in chronic heart failure; Labetalol in aortic dissection & preeclampsia"
+                ],
+                [
+                  "Esmolol",
+                  "Beta-1 selective",
+                  "Ultra-short acting (t1/2 ~9m)",
+                  "Intraoperative SVT, acute hypertensive crisis"
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "chapter_title": "Chapter 2: Antimicrobial Chemotherapy and Resistance",
+        "topics": [
+          {
+            "topic_title": "Antimicrobial Therapy for Central Nervous System Infections: Ceftriaxone, Vancomycin, Ampicillin, and Chemoprophylaxis",
+            "paragraphs": [
+              "Antimicrobial treatment of Acute Bacterial Meningitis demands high-dose, bactericidal intravenous antibiotics capable of crossing the inflamed blood-brain barrier. The empiric gold-standard regimen for community-acquired bacterial meningitis in immunocompetent adults (<50 years) is Ceftriaxone (2g IV q12h) PLUS Vancomycin (15-20 mg/kg IV q8-12h).",
+              "Ceftriaxone provides rapid bactericidal CSF penetration against N. meningitidis, H. influenzae, and penicillin-sensitive S. pneumoniae. Vancomycin is mandatory to ensure coverage against penicillin-resistant Streptococcus pneumoniae (PRSP). In patients >50 years, neonates, or immunocompromised individuals, intravenous Ampicillin (2g IV q4h) must be added empirically to cover Listeria monocytogenes, which is inherently resistant to all cephalosporins.",
+              "Adjunctive Dexamethasone (10 mg IV q6h for 4 days) significantly reduces sensorineural hearing loss and mortality in pneumococcal and H. influenzae meningitis, but MUST be administered prior to or with the first antibiotic dose. Chemoprophylaxis for close contacts of Neisseria meningitidis is achieved using oral Rifampin (600 mg BID for 2 days), single-dose oral Ciprofloxacin (500 mg), or intramuscular Ceftriaxone (250 mg)."
+            ],
+            "pearl": "Add Ampicillin to Ceftriaxone + Vancomycin in patients >50 years or immunocompromised to cover Listeria monocytogenes (which is resistant to all cephalosporins). Dexamethasone must precede or accompany the first antibiotic dose.",
+            "table": {
+              "data": [
+                [
+                  "Patient Category",
+                  "Empiric Antibiotic Regimen",
+                  "Target Pathogens",
+                  "Adjunctive / Prophylactic Therapy"
+                ],
+                [
+                  "Adults 3 months to 50 years",
+                  "Ceftriaxone 2g IV q12h + Vancomycin 15-20mg/kg q12h",
+                  "S. pneumoniae, N. meningitidis",
+                  "Dexamethasone 10 mg IV with first dose"
+                ],
+                [
+                  "Adults > 50 yrs / Immunocompromised",
+                  "Ceftriaxone + Vancomycin + Ampicillin 2g IV q4h",
+                  "S. pneumoniae, N. meningitidis, Listeria monocytogenes",
+                  "Dexamethasone 10 mg IV; stop if non-pneumococcal"
+                ],
+                [
+                  "Post-Neurosurgical / Trauma",
+                  "Vancomycin + Cefepime (or Meropenem)",
+                  "MRSA, Pseudomonas aeruginosa, Enterobacteriaceae",
+                  "Strict CSF drain monitoring and source control"
+                ],
+                [
+                  "Close Contacts of N. meningitidis",
+                  "Rifampin (600mg BID x2d) OR Ciprofloxacin (500mg po)",
+                  "Eradication of nasopharyngeal meningococcal carriage",
+                  "Droplet isolation until 24h of effective antibiotics"
+                ]
+              ]
+            }
+          },
+          {
+            "topic_title": "Beta-Lactam Antibiotics, Cephalosporin Generations and Resistance Mechanisms",
+            "paragraphs": [
+              "Beta-lactam antibiotics (Penicillins, Cephalosporins, Carbapenems, Monobactams) inhibit bacterial cell wall synthesis. The beta-lactam ring mimics D-alanyl-D-alanine, irreversibly binding and inactivating penicillin-binding proteins (PBPs/transpeptidases), blocking peptidoglycan cross-linking and provoking osmotic lysis.",
+              "Cephalosporin generations exhibit evolving antimicrobial spectra: 1st Gen (Cefazolin, Cephalexin) target Gram-positive cocci; 2nd Gen (Cefuroxime, Cefoxitin) add H. influenzae and anaerobes; 3rd Gen (Ceftriaxone, Ceftazidime) provide broad Gram-negative coverage and cross the blood-brain barrier for bacterial meningitis; 4th Gen (Cefepime) combines Gram-positive and anti-pseudomonal coverage; 5th Gen (Ceftaroline) binds mutated PBP2a to kill MRSA.",
+              "Resistance mechanisms include bacterial beta-lactamases (ESBLs, AmpC, carbapenemases like NDM-1), altered PBPs (mecA gene encoding PBP2a in MRSA), and decreased outer membrane porin permeability."
+            ],
+            "pearl": "Ceftriaxone is the primary cephalosporin for bacterial meningitis due to superb CSF penetration; Ceftaroline (5th Gen) is the only cephalosporin active against MRSA.",
+            "table": {
+              "data": [
+                [
+                  "Generation",
+                  "Key Agents",
+                  "Spectrum & Special Properties",
+                  "Clinical Indications"
+                ],
+                [
+                  "1st Gen",
+                  "Cefazolin, Cephalexin",
+                  "Gram-positive cocci, PEcK (Proteus, E. coli, Klebsiella)",
+                  "Surgical wound prophylaxis, cellulitis"
+                ],
+                [
+                  "2nd Gen",
+                  "Cefuroxime, Cefoxitin",
+                  "Extended Gram-negative + anaerobes (Cefoxitin)",
+                  "PID, abdominal sepsis, sinusitis"
+                ],
+                [
+                  "3rd Gen",
+                  "Ceftriaxone, Ceftazidime",
+                  "Broad Gram-negative, excellent CSF penetration; Ceftazidime vs Pseudomonas",
+                  "Bacterial meningitis, gonorrhea, hospital-acquired pneumonia"
+                ],
+                [
+                  "4th Gen",
+                  "Cefepime",
+                  "Broad Gram-positive + Pseudomonas aeruginosa",
+                  "Febrile neutropenia, severe nosocomial sepsis"
+                ],
+                [
+                  "5th Gen",
+                  "Ceftaroline",
+                  "Binds mutated PBP2a; active against MRSA",
+                  "Complicated skin/soft tissue infections, MRSA pneumonia"
+                ]
+              ]
+            }
+          },
+          {
+            "topic_title": "Ribosomal Protein Synthesis Inhibitors: Macrolides, Aminoglycosides, and Toxicity Profiles",
+            "paragraphs": [
+              "Protein synthesis inhibitors exploit differences between bacterial 70S (50S + 30S) and eukaryotic 80S ribosomes.",
+              "Macrolides (Azithromycin, Clarithromycin) bind the 23S rRNA of the 50S subunit, inhibiting peptidyl-tRNA translocation (bacteriostatic). They cover atypical respiratory pathogens (Mycoplasma, Chlamydia, Legionella). Key adverse effects include QT prolongation (torsades de pointes) and motilin-mediated GI distress.",
+              "Aminoglycosides (Gentamicin, Amikacin) bind irreversibly to the 30S subunit, causing mRNA misreading (bactericidal). They require oxygen for uptake and lack activity against anaerobes. Dose-limiting toxicities are irreversible Ototoxicity and reversible Nephrotoxicity (acute tubular necrosis)."
+            ],
+            "pearl": "Remember: 30S inhibitors = Aminoglycosides, Tetracyclines; 50S inhibitors = Macrolides (Azithromycin), Chloramphenicol, Clindamycin, Linezolid.",
+            "table": {
+              "data": [
+                [
+                  "Drug Group",
+                  "Ribosomal Target",
+                  "Mechanism",
+                  "Characteristic Toxicities"
+                ],
+                [
+                  "Macrolides (Azithromycin, Clarithromycin)",
+                  "50S Subunit",
+                  "Inhibits peptidyl-tRNA translocation (bacteriostatic)",
+                  "QT prolongation (Torsades), motilin receptor GI distress, CYP3A4 inhibition"
+                ],
+                [
+                  "Aminoglycosides (Gentamicin, Amikacin)",
+                  "30S Subunit",
+                  "Misreading of mRNA codons (bactericidal)",
+                  "Ototoxicity (cochlear/vestibular), Nephrotoxicity (ATN), neuromuscular blockade"
+                ],
+                [
+                  "Tetracyclines (Doxycycline)",
+                  "30S Subunit",
+                  "Blocks aminoacyl-tRNA attachment to A-site",
+                  "Teeth discoloration in children, photosensitivity, esophageal ulceration"
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "Internal_Medicine_and_Clinical_Methods_MBBS3_5.pdf": {
+    "filename": "Internal_Medicine_and_Clinical_Methods_MBBS3_5.pdf",
+    "book_title": "Principles of Internal Medicine and Clinical Examination",
+    "subject": "Internal Medicine",
+    "mbbs_year": "MBBS 3rd to Final Year",
+    "chapters": [
+      {
+        "chapter_title": "Chapter 1: Cardiology and Acute Coronary Syndromes",
+        "topics": [
+          {
+            "topic_title": "Acute Chest Pain Workup, STEMI vs NSTEMI, and Immediate Management",
+            "paragraphs": [
+              "Chest pain requires rapid risk stratification to rule out life-threatening causes: acute coronary syndrome (ACS), aortic dissection, pulmonary embolism, tension pneumothorax, esophageal rupture, and cardiac tamponade.",
+              "An ECG must be acquired within 10 minutes. STEMI is defined as new ST-segment elevation at the J-point in >= 2 contiguous leads (> 1 mm in all leads except V2-V3, where thresholds are 1.5-2.5 mm) or new LBBB. Positive troponin without ST elevation indicates NSTEMI.",
+              "Immediate emergency management of STEMI is rapid reperfusion: Primary PCI within 90 minutes door-to-balloon time. If PCI unavailable within 120 minutes, intravenous fibrinolytic therapy (Tenecteplase) within 30 minutes door-to-needle time. Adjunctive therapy includes dual antiplatelets (Aspirin 300mg + Ticagrelor 180mg), anticoagulation (Heparin/Enoxaparin), high-intensity statin (Atorvastatin 80mg), and sublingual nitroglycerin (avoided in RV infarction)."
+            ],
+            "pearl": "Avoid nitrates and morphine in Right Ventricular Infarction (inferior ST elevations in II, III, aVF with ST elevation in V4R) because RV output is critically preload-dependent; nitrates precipitate severe shock.",
+            "table": {
+              "data": [
+                [
+                  "ACS Category",
+                  "ECG Diagnostic Criteria",
+                  "Troponin Biomarkers",
+                  "Reperfusion Strategy"
+                ],
+                [
+                  "STEMI",
+                  "ST elevation in >=2 contiguous leads or new LBBB",
+                  "Markedly elevated",
+                  "Immediate Primary PCI within 90 min; otherwise thrombolysis within 30 min"
+                ],
+                [
+                  "NSTEMI",
+                  "ST depression, T-wave inversion, or normal ECG",
+                  "Elevated above 99th percentile",
+                  "Dual antiplatelet, anticoagulation, early invasive coronary angiography within 24h"
+                ],
+                [
+                  "Unstable Angina",
+                  "ST depression or T-wave inversion",
+                  "Normal (no myocardial necrosis)",
+                  "Antiplatelet, anti-ischemic therapy, risk stratification (TIMI/GRACE score)"
+                ]
+              ]
+            }
+          },
+          {
+            "topic_title": "Heart Failure Classification, NYHA Stages and Guideline Medical Therapy (GDMT)",
+            "paragraphs": [
+              "Heart Failure (HF) is a clinical syndrome of cardinal symptoms (dyspnea, orthopnea, paroxysmal nocturnal dyspnea, fatigue, peripheral edema) from structural or functional abnormalities that impair ventricular filling or ejection.",
+              "HF is categorized by Left Ventricular Ejection Fraction (LVEF): (1) HFrEF (LVEF <= 40%); (2) HFmrEF (LVEF 41-49%); (3) HFpEF (LVEF >= 50%). Functional severity is graded by NYHA Class I (no limitation) to Class IV (symptoms at rest).",
+              "Guideline-directed medical therapy (GDMT) for HFrEF consists of the 'Four Pillars' proven to reduce mortality: (1) SGLT2 Inhibitors (Dapagliflozin/Empagliflozin); (2) ARNI (Sacubitril/Valsartan) or ACEi/ARB; (3) Beta-blockers (Carvedilol, Metoprolol succinate, Bisoprolol); (4) Mineralocorticoid Receptor Antagonists (MRA: Spironolactone/Eplerenone). Loop diuretics (Furosemide) provide symptom relief without mortality benefit."
+            ],
+            "pearl": "The 4 Pillars of HFrEF mortality reduction: ARNI/ACEi + Beta-blocker + MRA (Spironolactone) + SGLT2 inhibitor (Dapagliflozin). Furosemide provides symptom control but does not reduce mortality.",
+            "table": {
+              "data": [
+                [
+                  "Pillar",
+                  "Representative Drug",
+                  "Mechanistic Target",
+                  "Proven Benefit"
+                ],
+                [
+                  "ARNI / ACEi",
+                  "Sacubitril / Valsartan",
+                  "Neprilysin inhibition + AT1 blockade",
+                  "20% mortality reduction vs Enalapril alone (PARADIGM-HF)"
+                ],
+                [
+                  "Beta-Blocker",
+                  "Carvedilol, Metoprolol succinate",
+                  "Anti-sympathetic neurohormonal blockade",
+                  "34% mortality reduction; prevent sudden cardiac death"
+                ],
+                [
+                  "MRA",
+                  "Spironolactone, Eplerenone",
+                  "Aldosterone antagonism in distal nephron",
+                  "30% mortality reduction in severe HFrEF (RALES trial)"
+                ],
+                [
+                  "SGLT2 Inhibitor",
+                  "Dapagliflozin, Empagliflozin",
+                  "Inhibition of renal SGLT2; cardiac metabolic switch",
+                  "Reduces CV death and HF hospitalizations regardless of diabetes status"
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "chapter_title": "Chapter 2: Pulmonology and Nephrology",
+        "topics": [
+          {
+            "topic_title": "Community-Acquired Pneumonia: CURB-65 Severity Scoring and Antimicrobial Regimens",
+            "paragraphs": [
+              "Community-Acquired Pneumonia (CAP) presents with fever, cough, purulent sputum, pleuritic pain, and new focal infiltrate on chest radiography. Streptococcus pneumoniae remains the most frequent pathogen.",
+              "Triage is guided by CURB-65 score: (1) Confusion; (2) Urea > 7.0 mmol/L; (3) Respiratory rate >= 30/min; (4) Blood pressure low (SBP < 90 or DBP <= 60 mmHg); (5) Age >= 65. Score 0-1 = low risk (outpatient); Score 2 = moderate risk (inpatient); Score 3-5 = high risk (urgent hospital/ICU admission).",
+              "Empiric antibiotics: Outpatient low-risk receives Amoxicillin, Doxycycline, or Azithromycin. Hospitalized non-severe receives Ceftriaxone plus Azithromycin or respiratory fluoroquinolone monotherapy (Levofloxacin). Severe ICU CAP receives IV Ceftriaxone + Azithromycin + Vancomycin/Linezolid if MRSA suspected."
+            ],
+            "pearl": "CURB-65 criteria: Confusion, Urea > 7 mmol/L, Resp rate >= 30, BP < 90/60, Age >= 65. Score >= 3 requires urgent inpatient/ICU hospitalization.",
+            "table": {
+              "data": [
+                [
+                  "CURB-65 Score",
+                  "Risk Stratification",
+                  "30-Day Mortality",
+                  "Recommended Treatment Setting"
+                ],
+                [
+                  "0 to 1",
+                  "Low Risk",
+                  "0.7% to 2.1%",
+                  "Outpatient oral therapy (Amoxicillin or Doxycycline)"
+                ],
+                [
+                  "2",
+                  "Moderate Risk",
+                  "9.2%",
+                  "Inpatient medical ward or closely monitored ambulatory care"
+                ],
+                [
+                  "3 to 5",
+                  "High Risk / Severe",
+                  "15% to 40%",
+                  "Urgent inpatient hospitalization; ICU evaluation for scores 4-5"
+                ]
+              ]
+            }
+          },
+          {
+            "topic_title": "Acute Kidney Injury (AKI): KDIGO Staging, Diagnostic Workup and Management",
+            "paragraphs": [
+              "Acute Kidney Injury (AKI) is defined by KDIGO criteria: increase in serum creatinine >= 0.3 mg/dL within 48h, >= 1.5x baseline within 7 days, or urine output < 0.5 mL/kg/h for 6 hours.",
+              "AKI is categorized into: (1) Prerenal Azotemia: renal hypoperfusion without structural damage (dehydration, sepsis, heart failure, ACEi/NSAIDs), characterized by high urine osmolality (>500 mOsm/kg), fractional excretion of sodium FeNa < 1%, and BUN/Cr ratio > 20:1; (2) Intrinsic AKI: structural parenchymal damage. Acute Tubular Necrosis (ATN) is most common (ischemia, aminoglycosides, IV contrast), showing FeNa > 2% and 'muddy brown' granular casts; (3) Postrenal AKI: obstruction (BPH, calculi), diagnosed by hydronephrosis on ultrasound.",
+              "Management involves treating the reversible cause: rapid IV crystalloids in prerenal hypovolemia, discontinuing nephrotoxic drugs, and urgent renal replacement therapy indications (AEIOU: Acidosis, Electrolytes/Hyperkalemia, Ingestion/Toxins, Overload/Pulmonary edema, Uremic pericarditis/encephalopathy)."
+            ],
+            "pearl": "Prerenal AKI has FeNa < 1% and BUN/Cr > 20:1 with bland urine; Intrinsic ATN has FeNa > 2% and classic 'muddy brown' granular casts. Dialysis indications = AEIOU.",
+            "table": {
+              "data": [
+                [
+                  "Diagnostic Parameter",
+                  "Prerenal Azotemia",
+                  "Intrinsic AKI (Acute Tubular Necrosis)",
+                  "Postrenal Obstruction"
+                ],
+                [
+                  "BUN / Creatinine Ratio",
+                  "> 20 : 1",
+                  "< 15 : 1",
+                  "Variable (early >20:1, late <15:1)"
+                ],
+                [
+                  "Fractional Excretion of Na (FeNa)",
+                  "< 1.0%",
+                  "> 2.0%",
+                  "> 1.0% to 2.0%"
+                ],
+                [
+                  "Urine Osmolality",
+                  "> 500 mOsm/kg (concentrated)",
+                  "< 350 mOsm/kg (isosthenuric)",
+                  "< 400 mOsm/kg"
+                ],
+                [
+                  "Urine Microscopic Sediment",
+                  "Hyaline casts, minimal debris",
+                  "'Muddy brown' coarse granular casts, epithelial casts",
+                  "RBCs, crystals, or normal; ultrasound shows hydronephrosis"
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "chapter_title": "Chapter 3: Infectious Diseases and Clinical Neuro-Infections",
+        "topics": [
+          {
+            "topic_title": "Acute Bacterial, Viral and Tuberculous Meningitis: Clinical Triad, CSF Differentiation, and Empiric Regimens",
+            "paragraphs": [
+              "Meningitis is an acute inflammation of the leptomeninges (pia and arachnoid mater) and the subarachnoid space. Bacterial etiology varies by age: Streptococcus pneumoniae is the most common cause in adults and children over 2 months; Neisseria meningitidis is frequent in adolescents and young adults (associated with petechial/purpuric skin lesions in meningococcemia); Listeria monocytogenes occurs in neonates, adults > 50 years, and immunocompromised hosts; Group B Streptococcus (S. agalactiae) and E. coli predominate in neonates. Viral (aseptic) meningitis is most often caused by Enteroviruses.",
+              "The classic clinical triad comprises High Fever, Headache with photophobia, and Nuchal Rigidity (neck stiffness), present in >70% of cases. Physical examination reveals positive meningeal signs: Kernig's sign (resistance or pain upon passive knee extension when the patient is supine with hip flexed 90\u00b0) and Brudzinski's sign (involuntary flexion of hips and knees elicited by passive neck flexion). In meningococcal infection, rapidly progressing petechiae or purpura fulminans may be present. A non-contrast head CT should precede Lumbar Puncture (LP) ONLY if risk of herniation exists (papilledema, new-onset seizures, focal neurological deficits, altered consciousness GCS < 10, or immunocompromise).",
+              "Emergency Management: 'Door-to-antibiotic' time must be under 1 hour; antibiotics must NEVER be delayed for CT scanning or LP. Empiric therapy for adults aged 3 months to 50 years is Ceftriaxone (2g IV q12h) PLUS Vancomycin (15-20 mg/kg IV q8-12h). In patients > 50 years or immunocompromised, IV Ampicillin (2g IV q4h) MUST be added to cover Listeria. Adjunctive Dexamethasone (10 mg IV q6h) must be administered with or 15 minutes before the first dose of antibiotics to decrease mortality and sensorineural hearing loss in S. pneumoniae. Close contacts of N. meningitidis require chemoprophylaxis with Rifampin (600 mg BID x 2d) or Ciprofloxacin (500 mg single dose)."
+            ],
+            "pearl": "Never delay empiric antibiotics for CT or lumbar puncture in suspected acute bacterial meningitis. Dexamethasone (10 mg IV) must precede or accompany the first antibiotic dose to prevent neurological sequelae. Add Ampicillin for age > 50 to cover Listeria.",
+            "table": {
+              "data": [
+                [
+                  "Diagnostic Parameter",
+                  "Normal CSF",
+                  "Acute Bacterial Meningitis",
+                  "Viral (Aseptic) Meningitis",
+                  "Tuberculous Meningitis"
+                ],
+                [
+                  "Opening Pressure",
+                  "80 - 200 mm H2O",
+                  "Markedly Elevated (> 250 mm H2O)",
+                  "Normal to Mildly Elevated",
+                  "Elevated (marked basilar block)"
+                ],
+                [
+                  "Leukocyte Count (cells/uL)",
+                  "< 5 lymphocytes / uL",
+                  "Markedly Elevated (> 1000 - 10,000 / uL)",
+                  "Elevated (50 - 500 / uL)",
+                  "Elevated (100 - 500 / uL)"
+                ],
+                [
+                  "Differential Cell Predominance",
+                  "Mononuclear / Lymphocytes",
+                  "Marked Neutrophils (PMNs >= 80%)",
+                  "Lymphocytes (Mononuclear >= 80%)",
+                  "Lymphocytes / Monocytes"
+                ],
+                [
+                  "CSF Protein",
+                  "15 - 45 mg/dL",
+                  "Markedly Elevated (> 100 - 500 mg/dL)",
+                  "Normal to Slightly High (< 100 mg/dL)",
+                  "Very High (> 100 - 500 mg/dL; cobweb clot)"
+                ],
+                [
+                  "CSF / Serum Glucose Ratio",
+                  "> 0.6 (CSF glucose > 50 mg/dL)",
+                  "Markedly Decreased (< 0.4 or < 40 mg/dL)",
+                  "Normal (> 0.6; normal glucose)",
+                  "Markedly Decreased (< 0.3 or < 30 mg/dL)"
+                ],
+                [
+                  "Gram Stain & Culture",
+                  "Negative / Sterile",
+                  "Positive in 60-85% of cases",
+                  "Negative (PCR detects Enterovirus)",
+                  "AFB positive / GeneXpert MTB positive"
+                ]
+              ]
+            }
+          },
+          {
+            "topic_title": "Pulmonary and Extrapulmonary Tuberculosis: Pathogenesis, Diagnostic Workup, and ATT (HRZE) Regimen",
+            "paragraphs": [
+              "Tuberculosis (TB) is caused by Mycobacterium tuberculosis, an acid-fast bacillus transmitted via airborne droplet nuclei. Primary pulmonary infection establishes a subpleural Ghon focus with regional hilar lymphadenopathy (Ghon complex), typically healing into a calcified Ranke complex.",
+              "Post-primary (reactivation) TB involves the apical-posterior segments of upper lung lobes due to high oxygen tension, producing productive cough, hemoptysis, low-grade evening fever, night sweats, and weight loss. Extrapulmonary TB accounts for 15-20% of cases, including TB lymphadenitis (scrofula), pleural effusion, skeletal TB (Pott's spine), and Tuberculous Meningitis.",
+              "Diagnosis is confirmed by sputum Ziehl-Neelsen acid-fast staining and rapid molecular testing with CBNAAT / GeneXpert MTB/RIF (detecting M. tuberculosis and rifampin resistance within 2 hours). First-line standard Anti-Tubercular Therapy (ATT) comprises a 2-month intensive phase of four drugs\u2014Isoniazid (H), Rifampin (R), Pyrazinamide (Z), and Ethambutol (E)\u2014followed by a 4-month continuation phase of Isoniazid and Rifampin (2HRZE / 4HR)."
+            ],
+            "pearl": "Standard ATT protocol: 2 months of HRZE followed by 4 months of HR. Pyridoxine (Vitamin B6, 10-25 mg/day) must be co-administered with Isoniazid to prevent peripheral neuropathy.",
+            "table": {
+              "data": [
+                [
+                  "Drug",
+                  "Mechanism of Action",
+                  "Key Toxicities & Adverse Effects",
+                  "Clinical Monitoring"
+                ],
+                [
+                  "Isoniazid (H)",
+                  "Inhibits mycolic acid synthesis in mycobacterial cell wall",
+                  "Peripheral neuropathy (prevent with Pyridoxine/B6), Hepatitis, SLE-like syndrome",
+                  "Baseline and periodic liver function tests (LFTs)"
+                ],
+                [
+                  "Rifampin (R)",
+                  "Inhibits DNA-dependent RNA polymerase",
+                  "Orange-red discoloration of body fluids, Hepatitis, Potent CYP3A4 inducer",
+                  "Warn patients of red urine/tears; check drug interactions"
+                ],
+                [
+                  "Pyrazinamide (Z)",
+                  "Disrupts mycobacterial membrane potential in acidic phagosomes",
+                  "Hepatotoxicity (most potent among ATT), Hyperuricemia (gouty arthralgia)",
+                  "Serum uric acid and LFTs"
+                ],
+                [
+                  "Ethambutol (E)",
+                  "Inhibits arabinosyl transferase, blocking arabinogalactan synthesis",
+                  "Retrobulbar optic neuritis (loss of red-green color discrimination, decreased acuity)",
+                  "Visual acuity and Ishihara color chart testing"
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "chapter_title": "Chapter 4: Endocrinology, Gastroenterology and Acute Neurology",
+        "topics": [
+          {
+            "topic_title": "Diabetic Ketoacidosis (DKA) vs HHS: Pathophysiology, Fluid Protocols and Insulin Titration",
+            "paragraphs": [
+              "Diabetic Ketoacidosis (DKA) is an acute, life-threatening metabolic complication of absolute or relative insulin deficiency combined with counter-regulatory hormone excess (glucagon, cortisol, catecholamines, growth hormone), most common in Type 1 Diabetes Mellitus. Accelerated lipolysis releases free fatty acids converted by liver beta-oxidation into ketone bodies (acetoacetate, beta-hydroxybutyrate), generating severe high anion gap metabolic acidosis (anion gap > 12).",
+              "Diagnostic triad: Hyperglycemia (blood glucose > 250 mg/dL), metabolic acidosis (arterial pH < 7.30, serum bicarbonate < 18 mEq/L), and ketonemia/ketonuria with positive beta-hydroxybutyrate. Patients present with Kussmaul respirations (rapid, deep breathing to exhale CO2), fruity acetone breath, abdominal pain, nausea/vomiting, and severe dehydration (average 5-7 L fluid deficit). In contrast, Hyperosmolar Hyperglycemic State (HHS) features profound hyperglycemia (> 600 mg/dL), severe hyperosmolality (> 320 mOsm/kg), and severe dehydration (> 9 L deficit) without significant ketoacidosis.",
+              "Emergency Management: (1) Fluid resuscitation is the first priority: 0.9% Normal Saline at 1000 mL/hour during the first hour; (2) Potassium replacement: Insulin drives potassium intracellularly. If serum potassium is < 3.3 mEq/L, HOLD insulin and infuse IV KCl until K+ > 3.3 mEq/L to prevent fatal arrhythmias; (3) Intravenous regular insulin: 0.1 units/kg bolus followed by 0.1 units/kg/hour continuous infusion; (4) Add 5% Dextrose to fluids when blood glucose drops below 200 mg/dL to permit continued insulin infusion until the anion gap closes (bicarbonate >= 18 mEq/L, pH > 7.30)."
+            ],
+            "pearl": "Never start insulin in DKA if serum potassium is below 3.3 mEq/L; replace potassium first to prevent fatal cardiac arrest. Add 5% dextrose when glucose reaches 200 mg/dL while continuing insulin until the anion gap is closed.",
+            "table": {
+              "data": [
+                [
+                  "Diagnostic Parameter",
+                  "Diabetic Ketoacidosis (DKA)",
+                  "Hyperosmolar Hyperglycemic State (HHS)"
+                ],
+                [
+                  "Plasma Glucose",
+                  "> 250 mg/dL (typically 300 - 600 mg/dL)",
+                  "Markedly elevated (> 600 to 1200 mg/dL)"
+                ],
+                [
+                  "Arterial pH",
+                  "< 7.30 (severe if < 7.00)",
+                  "> 7.30 (normal to mildly reduced)"
+                ],
+                [
+                  "Serum Bicarbonate",
+                  "< 18 mEq/L (severe if < 10 mEq/L)",
+                  "> 18 mEq/L (near normal)"
+                ],
+                [
+                  "Serum Ketones (Beta-hydroxybutyrate)",
+                  "Markedly elevated (strongly positive)",
+                  "Negative or trace"
+                ],
+                [
+                  "Serum Effective Osmolality",
+                  "Variable (< 320 mOsm/kg)",
+                  "Markedly elevated (> 320 mOsm/kg)"
+                ],
+                [
+                  "Anion Gap",
+                  "Elevated (> 12 mEq/L)",
+                  "Normal to slightly elevated (< 12 mEq/L)"
+                ],
+                [
+                  "Average Fluid Deficit",
+                  "5 to 7 Liters (~100 mL/kg)",
+                  "9 to 12 Liters (~150 mL/kg)"
+                ]
+              ]
+            }
+          },
+          {
+            "topic_title": "Acute Ischemic Stroke vs Intracranial Hemorrhage: NIHSS, Non-Contrast CT, and Reperfusion Therapy",
+            "paragraphs": [
+              "Stroke is an acute focal neurological deficit of vascular origin lasting > 24 hours. It is divided into Acute Ischemic Stroke (85%, caused by thrombosis or cardioembolism) and Intracranial Hemorrhage (15%, intracerebral or subarachnoid).",
+              "Emergency Triage: The immediate mandatory investigation is an urgent Non-Contrast Head CT (NCCT) to rule out intracranial hemorrhage before administering thrombolytic therapy. Ischemic stroke appears normal in the early hours (except early signs: hyperdense MCA sign, insular ribbon loss, sulcal effacement), whereas acute hemorrhage appears hyperdense (bright white).",
+              "Reperfusion Windows: For acute ischemic stroke, intravenous thrombolysis with Alteplase (0.9 mg/kg, max 90 mg) or Tenecteplase is recommended within 4.5 hours of symptom onset (target door-to-needle time < 45 min), provided blood pressure is < 185/110 mmHg and contraindications (active bleeding, recent surgery, platelets < 100k, INR > 1.7) are absent. Mechanical thrombectomy is indicated for Large Vessel Occlusion (LVO in internal carotid or proximal MCA) within 6 to 24 hours."
+            ],
+            "pearl": "Non-contrast head CT is the first test in acute stroke to rule out hemorrhage. The therapeutic window for IV thrombolysis (Alteplase) is 4.5 hours; mechanical thrombectomy extends up to 24 hours for large vessel occlusion.",
+            "table": {
+              "data": [
+                [
+                  "Stroke Category",
+                  "Non-Contrast Head CT Finding",
+                  "Primary Etiology",
+                  "Acute Reperfusion Modality"
+                ],
+                [
+                  "Ischemic Stroke (Thrombotic)",
+                  "Initially normal or early sulcal effacement / hyperdense vessel",
+                  "Atherosclerotic plaque rupture / in-situ thrombosis",
+                  "IV Alteplase within 4.5h; Thrombectomy within 24h"
+                ],
+                [
+                  "Ischemic Stroke (Embolic)",
+                  "Multiple vascular territory wedge-shaped infarcts",
+                  "Atrial fibrillation (left atrial appendage thrombus), endocarditis",
+                  "IV Alteplase within 4.5h; long-term oral anticoagulation"
+                ],
+                [
+                  "Intracerebral Hemorrhage (ICH)",
+                  "Hyperdense (bright white) parenchymal hematoma + edema",
+                  "Chronic hypertension (Charcot-Bouchard aneurysms), amyloid angiopathy",
+                  "BP lowering (target SBP 140 mmHg), reverse coagulopathy, surgical evacuation if cerebellar >3cm"
+                ],
+                [
+                  "Subarachnoid Hemorrhage (SAH)",
+                  "Hyperdense blood in basal cisterns and sulci; 'worst headache'",
+                  "Rupture of saccular berry aneurysm (circle of Willis)",
+                  "Nimodipine (prevent vasospasm), endovascular coiling or surgical clipping"
+                ]
+              ]
+            }
+          },
+          {
+            "topic_title": "Liver Cirrhosis, Portal Hypertension, and Esophageal Variceal Hemorrhage Management",
+            "paragraphs": [
+              "Cirrhosis represents end-stage diffuse hepatic fibrosis with regenerative nodule formation, disrupting hepatic architecture and vascular flow. Chronic hepatitis B/C and alcohol are leading etiologies. Fibrous septa are deposited by activated Hepatic Stellate Cells (Ito cells) under TGF-beta stimulation.",
+              "Portal Hypertension (hepatic venous pressure gradient HVPG > 5 mmHg; clinically significant if >= 10 mmHg) produces cardinal clinical sequelae: Splenomegaly (hypersplenism and thrombocytopenia), Ascites, Portosystemic shunts (esophageal and gastric varices, caput medusae, hemorrhoids), and Hepatic Encephalopathy (elevated ammonia). Ascites workup requires diagnostic paracentesis to calculate the Serum-Ascites Albumin Gradient (SAAG): SAAG >= 1.1 g/dL indicates portal hypertension (cirrhosis, heart failure, Budd-Chiari); SAAG < 1.1 g/dL indicates peritoneal causes (carcinomatosis, tuberculosis, nephrotic syndrome).",
+              "Acute Esophageal Variceal Hemorrhage is a medical emergency: (1) Restrictive blood transfusion targeting hemoglobin 7-8 g/dL; (2) Vasoactive splanchnic vasoconstrictor: IV Octreotide (50 mcg bolus then 50 mcg/h) or Terlipressin; (3) Prophylactic antibiotic: Ceftriaxone (1g/day IV x 7 days) to prevent spontaneous bacterial peritonitis (SBP); (4) Emergency upper GI endoscopy within 12 hours for Endoscopic Variceal Ligation (EVL); (5) Secondary prophylaxis: non-selective beta-blockers (Propranolol, Carvedilol) plus repeated EVL until varices are eradicated."
+            ],
+            "pearl": "SAAG >= 1.1 g/dL confirms portal hypertension as the cause of ascites. In acute variceal bleed: IV Octreotide + IV Ceftriaxone + urgent Endoscopic Band Ligation (EVL) + restrictive transfusion (target Hb 7-8 g/dL).",
+            "table": {
+              "data": [
+                [
+                  "Complication",
+                  "Diagnostic Parameter",
+                  "First-Line Medical Therapy",
+                  "Definitive / Interventional Management"
+                ],
+                [
+                  "Esophageal Variceal Bleed",
+                  "Endoscopy: actively spurting or oozing varix",
+                  "IV Octreotide / Terlipressin + IV Ceftriaxone",
+                  "Endoscopic Variceal Ligation (EVL) / TIPS if refractory"
+                ],
+                [
+                  "Ascites",
+                  "SAAG >= 1.1 g/dL with total protein < 2.5 g/dL",
+                  "Sodium restriction (<2g/d) + Spironolactone : Furosemide (100:40 ratio)",
+                  "Therapeutic paracentesis with IV Albumin (8g per liter removed >5L)"
+                ],
+                [
+                  "Spontaneous Bacterial Peritonitis",
+                  "Ascitic PMN count >= 250 cells/uL",
+                  "IV Ceftriaxone or Cefotaxime (2g q8h x 5 days)",
+                  "Long-term secondary prophylaxis with daily oral Norfloxacin"
+                ],
+                [
+                  "Hepatic Encephalopathy",
+                  "Asterixis (flapping tremor), elevated ammonia, West Haven staging",
+                  "Lactulose (titrated to 2-3 soft stools/day) + Rifaximin (550mg BID)",
+                  "Correct precipitating trigger (infection, GI bleed, hypokalemia)"
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "General_Surgery_and_Critical_Care_MBBS4_5.pdf": {
+    "filename": "General_Surgery_and_Critical_Care_MBBS4_5.pdf",
+    "book_title": "Principles of General Surgery and Critical Care",
+    "subject": "General Surgery",
+    "mbbs_year": "MBBS 4th and Final Year",
+    "chapters": [
+      {
+        "chapter_title": "Chapter 1: Trauma, Shock and Resuscitation Protocols",
+        "topics": [
+          {
+            "topic_title": "Advanced Trauma Life Support (ATLS) Primary Survey and Thoracic Emergencies",
+            "paragraphs": [
+              "The ATLS protocol establishes a prioritized ABCDE algorithm: Airway with cervical spine protection, Breathing with ventilation, Circulation with hemorrhage control, Disability (neurological evaluation GCS), and Exposure/Environmental control.",
+              "Immediate life-threatening thoracic trauma identified in primary survey: (1) Tension Pneumothorax presents with dyspnea, tracheal deviation away from affected side, absent breath sounds, hyperresonance, hypotension. Treatment is immediate needle decompression (14G cannula in 2nd ICS MCL or 5th ICS AAL) followed by tube thoracostomy (5th ICS MAL); (2) Cardiac Tamponade presents with Beck's Triad (hypotension, JVD, muffled heart sounds). FAST confirms diagnosis; treated by pericardiocentesis or pericardial window; (3) Massive Hemothorax (>1500 mL blood) requires chest tube and emergency thoracotomy if initial output >1500 mL or >200 mL/h for 2-4 hours."
+            ],
+            "pearl": "Never wait for an X-ray to treat a Tension Pneumothorax; it is a clinical diagnosis requiring immediate needle decompression followed by chest tube placement.",
+            "table": {
+              "data": [
+                [
+                  "Condition",
+                  "Physical Findings",
+                  "Immediate Bedside Intervention",
+                  "Definitive Management"
+                ],
+                [
+                  "Tension Pneumothorax",
+                  "Tracheal deviation, hyperresonance, absent breath sounds, hypotension",
+                  "Needle thoracostomy (14G cannula, 2nd ICS MCL or 5th ICS AAL)",
+                  "Tube thoracostomy (chest drain, 5th ICS MAL)"
+                ],
+                [
+                  "Cardiac Tamponade",
+                  "Beck's Triad (hypotension, JVD, muffled heart sounds), pulsus paradoxus",
+                  "FAST ultrasound confirmation",
+                  "Pericardiocentesis / Emergency subxiphoid pericardiotomy"
+                ],
+                [
+                  "Massive Hemothorax",
+                  "Dullness to percussion, absent breath sounds, shock",
+                  "Large-bore chest tube (28-32 Fr)",
+                  "Emergency thoracotomy if initial output >1500 mL or >200 mL/h"
+                ]
+              ]
+            }
+          },
+          {
+            "topic_title": "Classification and Hemodynamic Management of Hemorrhagic and Septic Shock",
+            "paragraphs": [
+              "Shock is systemic tissue hypoperfusion causing cellular hypoxia and lactic acidosis. ATLS classifies hemorrhage into four classes: Class I (<15% blood loss, <750 mL, normal vitals); Class II (15-30% loss, 750-1500 mL, tachycardia 100-120 bpm, normal SBP, narrow pulse pressure; crystalloid resuscitation); Class III (30-40% loss, 1500-2000 mL, tachycardia >120 bpm, hypotension, oliguria; requires blood + crystalloids); Class IV (>40% loss, >2000 mL, severe shock, negligible urine; requires Massive Transfusion Protocol 1:1:1 PRBC, FFP, Platelets).",
+              "Septic Shock is vasodilation and capillary leak from systemic infection. Surviving Sepsis Campaign bundle mandates within 1 hour: measure lactate, obtain blood cultures before antibiotics, administer broad-spectrum IV antibiotics, infuse 30 mL/kg balanced crystalloids for hypotension (MAP < 65 mmHg) or lactate >= 4 mmol/L, and apply vasopressors (Norepinephrine first-line) to maintain MAP >= 65 mmHg."
+            ],
+            "pearl": "Hypotension appears only in Class III shock (>30% blood loss); narrow pulse pressure and tachycardia are the earliest signs of Class II. Norepinephrine is first-line vasopressor for septic shock.",
+            "table": {
+              "data": [
+                [
+                  "Shock Class",
+                  "Blood Loss (mL / %)",
+                  "Heart Rate",
+                  "Blood Pressure",
+                  "Fluid / Blood Requirement"
+                ],
+                [
+                  "Class I",
+                  "< 750 mL (< 15%)",
+                  "< 100 bpm",
+                  "Normal",
+                  "Crystalloid or none"
+                ],
+                [
+                  "Class II",
+                  "750 - 1500 mL (15 - 30%)",
+                  "100 - 120 bpm",
+                  "Normal systolic, decreased pulse pressure",
+                  "Crystalloid infusion (Ringer's lactate)"
+                ],
+                [
+                  "Class III",
+                  "1500 - 2000 mL (30 - 40%)",
+                  "120 - 140 bpm",
+                  "Decreased (Hypotension)",
+                  "Crystalloids + Blood products (PRBCs)"
+                ],
+                [
+                  "Class IV",
+                  "> 2000 mL (> 40%)",
+                  "> 140 bpm",
+                  "Profound hypotension, narrow PP",
+                  "Massive Transfusion Protocol (1:1:1 ratio)"
+                ]
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "chapter_title": "Chapter 2: Acute Abdominal Emergencies and Surgical Oncology",
+        "topics": [
+          {
+            "topic_title": "Acute Appendicitis: Pathogenesis, Alvarado Scoring and Surgical Management",
+            "paragraphs": [
+              "Acute appendicitis is initiated by luminal obstruction of the vermiform appendix by a fecalith (adults) or lymphoid hyperplasia (children). Continued mucus secretion elevates intraluminal pressure, provoking ischemia, bacterial invasion, and gangrene.",
+              "Pain begins periumbilically (T10 dermatome visceral pain) then localizes to Right Iliac Fossa at McBurney's point (somatic peritoneal pain). Diagnostic signs: Rovsing sign (LLQ palpation causes RIF pain), Psoas sign (retrocecal appendix pain on hip hyperextension), Obturator sign (pelvic appendix pain on internal hip rotation).",
+              "Alvarado Score: Migration of pain (1), Anorexia (1), Nausea/vomiting (1), Tenderness in RIF (2), Rebound tenderness (1), Elevated temp >= 37.3\u00b0C (1), Leukocytosis >= 10,000 (2), Left shift (1). Score >= 7 strongly predicts appendicitis warranting appendectomy."
+            ],
+            "pearl": "Psoas sign indicates retrocecal appendicitis; Obturator sign indicates pelvic appendicitis. Alvarado score >= 7 warrants prompt appendectomy.",
+            "table": {
+              "data": [
+                [
+                  "Sign / Symptom",
+                  "Alvarado Points",
+                  "Physiological / Anatomical Mechanism"
+                ],
+                [
+                  "Symptoms",
+                  "3 points total",
+                  "Migration of pain to RIF (1), Anorexia (1), Nausea/Vomiting (1)"
+                ],
+                [
+                  "Signs",
+                  "4 points total",
+                  "Tenderness in RIF (2), Rebound tenderness (1), Elevated temperature >= 37.3\u00b0C (1)"
+                ],
+                [
+                  "Laboratory",
+                  "3 points total",
+                  "Leukocytosis > 10,000 (2), Neutrophilic band shift to left (1)"
+                ],
+                [
+                  "Total Score",
+                  "10 points",
+                  "Score 1-4: Unlikely; Score 5-6: Observation/CT; Score 7-10: Appendectomy"
+                ]
+              ]
+            }
+          },
+          {
+            "topic_title": "Inguinal Hernias: Anatomy, Hesselbach Triangle and Repair Techniques",
+            "paragraphs": [
+              "Inguinal hernias are classified into Indirect and Direct based on their relation to inferior epigastric vessels. Indirect Inguinal Hernia passes through the deep ring, lateral to inferior epigastric artery, within spermatic cord (patent processus vaginalis; most common in both sexes, can enter scrotum).",
+              "Direct Inguinal Hernia protrudes directly through Hesselbach's Triangle, medial to inferior epigastric vessels, due to transversalis fascia weakness (acquired in older men; rarely strangulates). Hesselbach's triangle is bounded by rectus abdominis (medial), inferior epigastric vessels (lateral), and inguinal ligament (inferior).",
+              "Deep ring occlusion test: examiner occludes the internal ring (1.25 cm above midinguinal point) while patient coughs. If hernia is controlled, it is indirect; if it emerges medial to the finger, it is direct. Standard repair is tension-free mesh hernioplasty (Lichtenstein technique)."
+            ],
+            "pearl": "Indirect hernias are lateral to inferior epigastric vessels (patent processus vaginalis); Direct hernias are medial in Hesselbach's triangle (acquired fascial weakness).",
+            "table": {
+              "data": [
+                [
+                  "Characteristic",
+                  "Indirect Inguinal Hernia",
+                  "Direct Inguinal Hernia"
+                ],
+                [
+                  "Relation to Inf Epigastric",
+                  "Lateral to vessels",
+                  "Medial to vessels (within Hesselbach triangle)"
+                ],
+                [
+                  "Entry Route",
+                  "Passes through deep inguinal ring into canal",
+                  "Pushes directly through transversalis fascia"
+                ],
+                [
+                  "Scrotal Descent",
+                  "Frequently descends into scrotum",
+                  "Rarely descends into scrotum"
+                ],
+                [
+                  "Strangulation Risk",
+                  "Higher risk due to narrow deep ring neck",
+                  "Low risk due to broad, wide neck"
+                ],
+                [
+                  "Deep Ring Occlusion Test",
+                  "Hernia controlled by occlusion of deep ring",
+                  "Hernia still protrudes despite occlusion of deep ring"
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "Essentials_of_Pediatrics_Ghai_Principles_MBBS4.pdf": {
+    "filename": "Essentials_of_Pediatrics_Ghai_Principles_MBBS4.pdf",
+    "book_title": "Essentials of Pediatrics: Ghai Principles",
+    "subject": "Pediatrics",
+    "mbbs_year": "MBBS 4th and Final Year",
+    "chapters": [
+      {
+        "chapter_title": "Chapter 1: Neonatal Care and Pediatric Infections",
+        "topics": [
+          {
+            "topic_title": "Neonatal Sepsis and Pediatric Bacterial Meningitis: Pathogens, Bulging Fontanelle, and Regimens",
+            "paragraphs": [
+              "Pediatric bacterial meningitis carries high morbidity and mortality. In neonates (< 1 month), pathogens are acquired from the maternal genital tract: Group B Streptococcus (S. agalactiae, 50%), Escherichia coli (K1 strain), and Listeria monocytogenes. In infants and children (> 2 months), Streptococcus pneumoniae and Neisseria meningitidis predominate.",
+              "Clinical presentation in infants is often subtle and non-specific: hypothermia or fever, poor feeding, lethargy, high-pitched cry, vomiting, irritability, seizures, and a tense Bulging Anterior Fontanelle. Classic signs like neck rigidity, Kernig's, and Brudzinski's signs are typically ABSENT in infants under 12-18 months due to open fontanelles and immature motor responses.",
+              "Immediate lumbar puncture and blood cultures are required. Empiric neonatal regimen is IV Ampicillin (to cover Listeria and GBS) PLUS IV Cefotaxime or Gentamicin. In older infants (> 2 months), IV Ceftriaxone (100 mg/kg/day) PLUS IV Vancomycin (60 mg/kg/day) is administered. Dexamethasone is beneficial in H. influenzae type b and pneumococcal meningitis if given with the first dose."
+            ],
+            "pearl": "Classic signs of meningeal irritation (Kernig/Brudzinski) are absent in infants <12-18 months; a tense bulging anterior fontanelle, lethargy, and poor feeding are the primary clinical indicators of meningitis. Empiric neonatal therapy requires Ampicillin + Cefotaxime/Gentamicin.",
+            "table": {
+              "data": [
+                [
+                  "Age Group",
+                  "Most Common Pathogens",
+                  "Clinical Hallmark Signs",
+                  "Empiric Antibiotic Regimen"
+                ],
+                [
+                  "Neonates (< 1 month)",
+                  "Group B Streptococcus (GBS), E. coli, Listeria monocytogenes",
+                  "Hypothermia, lethargy, bulging anterior fontanelle, poor feeding",
+                  "Ampicillin (150-200 mg/kg/d) + Cefotaxime or Gentamicin"
+                ],
+                [
+                  "Infants (1 to 23 months)",
+                  "Streptococcus pneumoniae, Neisseria meningitidis, H. influenzae",
+                  "Fever, vomiting, irritability, bulging fontanelle, seizures",
+                  "Ceftriaxone (100 mg/kg/d) + Vancomycin (60 mg/kg/d)"
+                ],
+                [
+                  "Children (>= 2 years)",
+                  "S. pneumoniae, N. meningitidis",
+                  "Fever, severe headache, photophobia, nuchal rigidity, Kernig/Brudzinski",
+                  "Ceftriaxone + Vancomycin + Dexamethasone (0.15 mg/kg q6h x 4d)"
+                ]
+              ]
+            }
+          },
+          {
+            "topic_title": "Pediatric Acute Diarrhea, Dehydration Assessment and WHO Oral Rehydration Protocols",
+            "paragraphs": [
+              "Acute diarrhea is passage of >= 3 loose stools per day lasting < 14 days, primarily caused by Rotavirus, enterotoxigenic E. coli (ETEC), and Shigella. The leading cause of death is dehydration and electrolyte loss.",
+              "WHO classifies dehydration into three stages: (1) No Dehydration (< 5% fluid deficit): alert, normal eyes, drinks normally, skin pinch retracts immediately; (2) Some Dehydration (5-10% deficit): restless, irritable, sunken eyes, drinks eagerly/thirsty, skin pinch goes back slowly (< 2s); (3) Severe Dehydration (> 10% deficit): lethargic or unconscious, very sunken eyes, unable to drink, skin pinch goes back very slowly (> 2s).",
+              "Management Protocols: Plan A (No dehydration): home fluids, zinc supplementation (20 mg/day for 14 days; 10 mg for < 6 months), continue feeding. Plan B (Some dehydration): Low-osmolarity Oral Rehydration Salt (ORS) solution (75 mL/kg over 4 hours) plus zinc. Plan C (Severe dehydration): emergency IV fluids with Ringer's Lactate (100 mL/kg divided into rapid initial and slower maintenance infusions according to age: < 12 months vs >= 12 months)."
+            ],
+            "pearl": "WHO Low-osmolarity ORS has total osmolarity of 245 mOsm/L (Na+ 75, Glucose 75, K+ 20, Cl- 65, Citrate 10). Zinc supplementation for 14 days reduces duration and recurrence.",
+            "table": {
+              "data": [
+                [
+                  "Dehydration Stage",
+                  "Clinical Signs (WHO Criteria)",
+                  "Estimated Fluid Deficit",
+                  "Treatment Protocol"
+                ],
+                [
+                  "No Dehydration",
+                  "Alert, active, normal eyes, drinks normally, skin pinch immediate",
+                  "< 5% (< 50 mL/kg)",
+                  "Plan A: Home fluids + Low-osmolarity ORS + Zinc for 14 days"
+                ],
+                [
+                  "Some Dehydration",
+                  "Restless/irritable, sunken eyes, thirsty/drinks eagerly, skin pinch slow (<2s)",
+                  "5% to 10% (50 - 100 mL/kg)",
+                  "Plan B: ORS 75 mL/kg orally over 4 hours + Zinc"
+                ],
+                [
+                  "Severe Dehydration",
+                  "Lethargic/unconscious, very sunken eyes, unable to drink, skin pinch >2s",
+                  "> 10% (> 100 mL/kg)",
+                  "Plan C: IV Ringer's Lactate 100 mL/kg (rapid emergency infusion)"
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MedGemini MBBS — Clinical Knowledge & Textbook Consultation AI</title>
+  <meta name="description" content="Gemini-style clinical AI companion for MBBS students with exact citations across 5 years of medical curriculum textbooks including Book Name, Chapter, Topic, and Page Number.">
+  
+  <!-- Google Fonts: Outfit, Inter, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%234f46e5' d='M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5z'/></svg>">
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="#" class="brand-badge">
+          <div class="brand-logo">
+            <svg viewBox="0 0 24 24"><path d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5z"/></svg>
+          </div>
+          <div>
+            <div class="brand-title">MedGemini</div>
+            <div class="brand-subtitle">5-Year MBBS Edition</div>
+          </div>
+        </a>
+      </div>
+
+      <button class="new-chat-btn" id="new-chat-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        New Consultation
+      </button>
+
+      <div class="sidebar-content">
+        <!-- Curriculum Year Filter -->
+        <div>
+          <div class="sidebar-section-title">Curriculum Year</div>
+          <select class="filter-select" id="year-filter-select">
+            <option value="all">All 5 Years Curriculum</option>
+            <option value="MBBS 1st Year">1st Year (Anatomy, Physiology)</option>
+            <option value="MBBS 2nd Year">2nd Year (Pathology, Pharmacology)</option>
+            <option value="MBBS 3rd to Final Year">3rd to 5th Year (Medicine, Surgery)</option>
+          </select>
+        </div>
+
+        <!-- Clinical Study Mode -->
+        <div>
+          <div class="sidebar-section-title">Clinical Study Mode</div>
+          <select class="filter-select" id="study-mode-select">
+            <option value="standard">🩺 Standard Clinical Q&A</option>
+            <option value="case_vignette">📋 Clinical Case Vignettes</option>
+            <option value="viva_quiz">🎓 Board Exam Viva / Quiz</option>
+          </select>
+        </div>
+
+        <!-- Recent Consultations History -->
+        <div>
+          <div class="sidebar-section-title">Recent Consultations</div>
+          <div class="history-list" id="history-list">
+            <!-- Dynamic session items -->
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="footer-btn" id="library-btn">
+          <span>📚 MBBS Book Library</span>
+          <span style="font-size:0.7rem; color:var(--med-blue); font-weight:600;">6 Books</span>
+        </button>
+        <button class="footer-btn" id="settings-btn">
+          <span>⚙️ Model & API Settings</span>
+          <span style="font-size:0.7rem; color:var(--med-green);">Config</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN VIEWPORT -->
+    <main class="main-stage">
+      
+      <!-- Top Navigation -->
+      <nav class="top-nav">
+        <div class="top-left">
+          <button class="icon-btn" id="toggle-sidebar-btn" title="Toggle Sidebar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          
+          <div class="model-pill">
+            <span class="model-dot" id="model-status-dot"></span>
+            <span id="model-pill-text">MedGemini Grounded Engine (6 Books)</span>
+          </div>
+        </div>
+
+        <!-- Quick Subject Pills -->
+        <div class="subject-pills">
+          <button class="subject-pill active" data-subject="all">All Subjects</button>
+          <button class="subject-pill" data-subject="Anatomy">Anatomy</button>
+          <button class="subject-pill" data-subject="Physiology">Physiology</button>
+          <button class="subject-pill" data-subject="Pathology">Pathology</button>
+          <button class="subject-pill" data-subject="Pharmacology">Pharmacology</button>
+          <button class="subject-pill" data-subject="Internal Medicine">Medicine</button>
+          <button class="subject-pill" data-subject="General Surgery">Surgery</button>
+        </div>
+
+        <div>
+          <button class="icon-btn" id="theme-toggle-btn" title="Toggle Theme">
+            ☀️ Light
+          </button>
+        </div>
+      </nav>
+
+      <!-- Chat Scrollable Region -->
+      <div class="chat-scroll-area" id="chat-scroll-area">
+        
+        <!-- Welcome Hero (Displayed when new chat) -->
+        <div class="welcome-hero" id="welcome-hero">
+          <div class="hero-sparkle">
+            <svg viewBox="0 0 24 24"><path d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5z"/></svg>
+          </div>
+          <h1 class="hero-title">Hello, <span class="hero-title-gradient">Doctor.</span></h1>
+          <p class="hero-desc">
+            Ask any question across your 5-year MBBS curriculum. Every medical answer is strictly grounded with
+            <strong>Book Name, Chapter, Topic, and Page Number</strong> citations directly from verified textbooks.
+          </p>
+
+          <!-- 4 High-Yield Prompt Suggestion Cards -->
+          <div class="prompt-grid" id="prompt-grid">
+            <!-- Dynamic sample prompt cards populated by app.js -->
+          </div>
+        </div>
+
+        <!-- Chat messages dynamically appended here -->
+      </div>
+
+      <!-- Bottom Floating Gemini Prompt Bar -->
+      <div class="prompt-container">
+        <div class="prompt-box">
+          <div class="prompt-input-row">
+            <textarea 
+              id="prompt-textarea" 
+              class="prompt-textarea" 
+              placeholder="Ask anything across 5 years of MBBS textbooks (e.g. cardiac cycle, ACEi cough, tension pneumothorax)..."
+              rows="1"
+            ></textarea>
+            
+            <button class="send-btn" id="send-btn" disabled title="Send Question">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+
+          <div class="prompt-meta-row">
+            <span>✨ Strictly Grounded in 5-Year Curriculum Textbooks</span>
+            <span>Press Enter to send • Shift + Enter for new line</span>
+          </div>
+        </div>
+        
+        <div class="disclaimer-text">
+          MedGemini provides academic medical knowledge with textbook citations. Always correlate with clinical judgment.
+        </div>
+      </div>
+
+    </main>
+
+    <!-- SLIDE-OUT REFERENCE & PDF PAGE INSPECTOR DRAWER -->
+    <aside class="inspector-drawer" id="inspector-drawer">
+      <div class="inspector-header">
+        <div class="inspector-title">Textbook Reference Viewer</div>
+        <button class="icon-btn close-inspector-btn" title="Close Drawer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="inspector-body">
+        <div class="book-card-header inspector-book-meta">
+          <!-- Metadata filled dynamically -->
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:0.8rem; font-weight:600; color:var(--text-secondary);">Page Excerpt Content</span>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <button class="icon-btn prev-page-btn" title="Previous Page">◀</button>
+            <span class="page-indicator" style="font-size:0.75rem; color:var(--text-muted); font-family:var(--font-mono);">Page 1 of 5</span>
+            <button class="icon-btn next-page-btn" title="Next Page">▶</button>
+          </div>
+        </div>
+
+        <div class="page-content-viewer">
+          <!-- Full page text with <mark> highlights loaded here -->
+        </div>
+      </div>
+    </aside>
+
+    <!-- TEXTBOOK LIBRARY MODAL -->
+    <div class="modal-overlay" id="library-modal">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <div class="modal-title">📚 MBBS Curriculum Textbook Library</div>
+          <button class="icon-btn" id="close-library-btn">✕</button>
+        </div>
+
+        <div style="font-size:0.84rem; color:var(--text-secondary);">
+          These 6 foundational textbooks are indexed page-by-page. You can also upload any additional MBBS textbook PDF below.
+        </div>
+
+        <div class="dropzone" id="dropzone">
+          <input type="file" id="pdf-file-input" accept=".pdf" style="display:none;">
+          <div style="color:var(--text-secondary); font-size:0.88rem;">
+            📄 <strong>Drop any MBBS textbook PDF here</strong> or click to browse<br>
+            <span style="font-size:0.75rem; color:var(--text-muted); margin-top:4px; display:inline-block;">
+              Automatically indexes chapters, topics, and page numbers for citation referencing
+            </span>
+          </div>
+        </div>
+
+        <div style="font-size:0.8rem; font-weight:600; color:var(--text-muted); text-transform:uppercase;">
+          Currently Loaded Textbooks
+        </div>
+
+        <div id="books-list-container" style="display:flex; flex-direction:column; gap:8px; max-height:240px; overflow-y:auto;">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS & LLM PROVIDER MODAL -->
+    <div class="modal-overlay" id="settings-modal">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <div class="modal-title">⚙️ LLM Engine & API Configuration</div>
+          <button class="icon-btn" id="close-settings-btn">✕</button>
+        </div>
+
+        <form id="settings-form" onsubmit="event.preventDefault();" style="display:flex; flex-direction:column; gap:18px;">
+          <div class="settings-group">
+            <label class="settings-label">Select LLM Provider Engine</label>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <label style="display:flex; align-items:center; gap:8px; font-size:0.86rem; cursor:pointer;">
+                <input type="radio" name="llm-provider" value="offline" checked>
+                <strong>MedGemini Built-in Grounded Engine</strong> (100% Free, Offline, Zero API Key needed)
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:0.86rem; cursor:pointer;">
+                <input type="radio" name="llm-provider" value="gemini">
+                <strong>Google Gemini 2.0 Flash</strong> (Fast, 1M token context, Free via Google AI Studio)
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:0.86rem; cursor:pointer;">
+                <input type="radio" name="llm-provider" value="groq">
+                <strong>Groq Cloud AI (Llama 3.3 70B)</strong> (Ultra-fast 300+ tok/s, Free via Groq Cloud)
+              </label>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <label class="settings-label">Google Gemini API Key (Optional)</label>
+            <input type="password" id="gemini-key-input" class="settings-input" placeholder="AIzaSy... (Get free at aistudio.google.com)" autocomplete="new-password">
+            <span style="font-size:0.72rem; color:var(--text-muted);">
+              Stored locally in your browser. Leave blank to use the built-in offline grounded engine.
+            </span>
+          </div>
+
+          <div class="settings-group">
+            <label class="settings-label">Groq API Key (Optional)</label>
+            <input type="password" id="groq-key-input" class="settings-input" placeholder="gsk_... (Get free at console.groq.com)" autocomplete="new-password">
+            <span style="font-size:0.72rem; color:var(--text-muted);">
+              Stored locally in your browser. Enables high-speed conversational reasoning across textbooks.
+            </span>
+          </div>
+
+          <button type="button" class="save-btn" id="save-settings-btn">Save Settings</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Main JavaScript Module -->
+  <script type="module" src="js/app.js?v=2.0.2"></script>
+</body>
+</html>
