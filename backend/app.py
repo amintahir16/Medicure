@@ -85,9 +85,12 @@ async def health_check():
     total_pages = sum(b.get("total_pages", 0) for b in books)
     return {
         "status": "healthy",
-        "system": "MedGemini MBBS AI 2.0",
+        "system": "MedGemini MBBS AI 2.0 (Hybrid Dense-Sparse RAG)",
         "indexed_books_count": len(books),
         "total_curriculum_pages": total_pages,
+        "embedding_engine": "FastEmbed (BAAI/bge-small-en-v1.5)",
+        "embedding_dimensions": 384,
+        "retrieval_architecture": "Dense Vector KNN (sqlite-vec) + Sparse BM25 (FTS5) via RRF",
         "default_provider": DEFAULT_LLM_PROVIDER,
         "active_models": {
             "gemini": GEMINI_MODEL,
