@@ -116,17 +116,62 @@ export class MedGeminiBookViewer {
 
     let content = data.content || "";
     
-    // Highlight matching excerpt if available
-    if (this.currentExcerpt && this.currentExcerpt.length > 20) {
-      const cleanQuote = this.currentExcerpt.slice(0, 80).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      try {
-        const regex = new RegExp(`(${cleanQuote})`, 'i');
-        content = content.replace(regex, '<mark>$1</mark>');
-      } catch (e) {
-        // Fallback without highlighting if regex fails
-      }
+    // Highlight matching clinical statement if available
+    if (this.currentExcerpt && this.currentExcerpt.trim().length > 15) {
+      content = this._applySmartHighlight(content, this.currentExcerpt);
     }
 
     this.viewerEl.innerHTML = content;
+
+    // Smoothly scroll the highlighted section into center view
+    const markEl = this.viewerEl.querySelector("mark");
+    if (markEl) {
+      setTimeout(() => {
+        markEl.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 120);
+    }
+  }
+
+  /**
+   * Identifies the core clinical sentence from the excerpt (ignoring running book/page headers)
+   * and highlights complete words without arbitrary character truncation.
+   */
+  _applySmartHighlight(content, excerpt) {
+    if (!content || !excerpt) return content;
+
+    const lines = excerpt.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    const isHeader = (l) => {
+      if (l.length < 12) return true;
+      if (/\b\d{1,4}\s*$/.test(l)) return true;
+      if (/^\d{1,4}\s*[I\|\-\–\\\/]/.test(l)) return true;
+      if (/handbook of|textbook of|principles of|curriculum reference/i.test(l)) return true;
+      return false;
+    };
+
+    // Filter out running page headers (e.g. "Connective Tissue, Ligaments and Raphe 203")
+    const validLines = lines.filter(l => !isHeader(l));
+    const cleanBlock = validLines.length > 0 ? validLines.join(' ') : lines.join(' ');
+
+    // Split into sentences / major clauses
+    const sentences = cleanBlock.split(/(?<=[.?!])\s+/).map(s => s.trim()).filter(s => s.length > 15);
+    const candidates = sentences.length > 0 ? sentences : [cleanBlock];
+
+    for (const cand of candidates) {
+      // Pick up to 16 full words to ensure whole-word integrity
+      const words = cand.split(/\s+/).filter(w => w.length > 0).slice(0, 16);
+      if (words.length < 3) continue;
+
+      const escapedPattern = words.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('\\s+');
+      try {
+        const regex = new RegExp(`(${escapedPattern})`, 'i');
+        if (regex.test(content)) {
+          return content.replace(regex, '<mark>$1</mark>');
+        }
+      } catch (e) {
+        // Continue to next candidate if regex syntax fails
+      }
+    }
+
+    return content;
   }
 }

@@ -83,4 +83,12 @@ export class MedGeminiAPI {
     if (!res.ok) throw new Error("Failed to create session");
     return res.json();
   }
+
+  async deleteSession(sessionId) {
+    const res = await fetch(`${this.baseUrl}/api/sessions/${sessionId}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) throw new Error("Failed to delete session");
+    return res.json();
+  }
 }

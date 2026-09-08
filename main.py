@@ -13,7 +13,6 @@ ROOT_DIR = Path(__file__).resolve().parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from backend.seed.book_builder import build_all_mbbs_books
 from backend.engine.indexer import MBBSIndexer
 
 def main():
@@ -22,21 +21,13 @@ def main():
     print("  5-Year Curriculum Knowledge Base with Exact Grounding Citations")
     print("=" * 65)
 
-    books_dir = ROOT_DIR / "books"
-    books = list(books_dir.glob("*.pdf")) if books_dir.exists() else []
-
-    if len(books) < 6:
-        print("[*] Generating 6 foundational MBBS curriculum textbooks...")
-        build_all_mbbs_books()
-
     indexer = MBBSIndexer()
-    summary = indexer.get_books_summary()
-    if len(summary) < 6:
-        print("[*] Indexing textbooks into SQLite FTS5 database...")
-        indexer.index_all_books()
-        summary = indexer.get_books_summary()
+    newly_indexed = indexer.sync_books_dir()
+    if newly_indexed:
+        print(f"[*] Auto-indexed {len(newly_indexed)} new textbook(s).")
 
-    print(f"[*] Knowledge base ready: {len(summary)} MBBS textbooks indexed.")
+    summary = indexer.get_books_summary()
+    print(f"[*] Knowledge base ready: {len(summary)} MBBS textbook(s) indexed.")
     for b in summary:
         print(f"    - {b['book_title']} ({b['subject']} • {b['total_pages']} pages)")
 

@@ -46,8 +46,13 @@ class MedGeminiApp {
     this.promptTextarea = document.getElementById("prompt-textarea");
     this.sendBtn = document.getElementById("send-btn");
     this.themeToggleBtn = document.getElementById("theme-toggle-btn");
+    this.modelPillBtn = document.getElementById("model-pill-btn");
     this.modelPillText = document.getElementById("model-pill-text");
     this.modelStatusDot = document.getElementById("model-status-dot");
+    this.headerLibraryBtn = document.getElementById("header-library-btn");
+    this.headerSettingsBtn = document.getElementById("header-settings-btn");
+    this.headerBookCount = document.getElementById("header-book-count");
+    this.toastContainer = document.getElementById("toast-container");
 
     // Filters & Selectors
     this.yearFilterSelect = document.getElementById("year-filter-select");
@@ -127,12 +132,13 @@ class MedGeminiApp {
       this.currentStudyMode = e.target.value;
     });
 
-    // Subject Pills
+    // Subject Pills with smooth scroll to center
     this.subjectPills.forEach(pill => {
       pill.addEventListener("click", () => {
         this.subjectPills.forEach(p => p.classList.remove("active"));
         pill.classList.add("active");
         this.currentSubjectFilter = pill.dataset.subject;
+        pill.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
       });
     });
 
@@ -141,6 +147,25 @@ class MedGeminiApp {
       const nextTheme = this.settings.theme === "dark" ? "light" : "dark";
       this.applyTheme(nextTheme);
     });
+
+    // Model Status Pill Click -> Opens Settings Modal
+    if (this.modelPillBtn) {
+      this.modelPillBtn.addEventListener("click", () => this.openSettingsModal());
+      this.modelPillBtn.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          this.openSettingsModal();
+        }
+      });
+    }
+
+    // Top Header Buttons
+    if (this.headerSettingsBtn) {
+      this.headerSettingsBtn.addEventListener("click", () => this.openSettingsModal());
+    }
+    if (this.headerLibraryBtn) {
+      this.headerLibraryBtn.addEventListener("click", () => this.openLibraryModal());
+    }
 
     // Settings Modal
     this.settingsBtn.addEventListener("click", () => this.openSettingsModal());
@@ -182,7 +207,8 @@ class MedGeminiApp {
       if (citPill) {
         const bookTitle = decodeURIComponent(citPill.dataset.book);
         const pageNum = citPill.dataset.page;
-        this.bookViewer.loadPage(bookTitle, pageNum);
+        const excerpt = decodeURIComponent(citPill.dataset.excerpt || "");
+        this.bookViewer.loadPage(bookTitle, pageNum, excerpt);
         return;
       }
 
@@ -190,7 +216,8 @@ class MedGeminiApp {
       if (inspectBtn) {
         const bookTitle = decodeURIComponent(inspectBtn.dataset.book);
         const pageNum = inspectBtn.dataset.page;
-        this.bookViewer.loadPage(bookTitle, pageNum);
+        const excerpt = decodeURIComponent(inspectBtn.dataset.excerpt || "");
+        this.bookViewer.loadPage(bookTitle, pageNum, excerpt);
         return;
       }
 
@@ -211,15 +238,33 @@ class MedGeminiApp {
 
       const copyBtn = e.target.closest(".copy-msg-btn");
       if (copyBtn) {
-        const textToCopy = copyBtn.dataset.rawText || "";
+        const textToCopy = decodeURIComponent(copyBtn.dataset.rawText || "");
         this.ui.copyToClipboard(textToCopy, copyBtn);
+        this.showToast("📋 Copied clinical answer to notes", "info");
         return;
       }
 
       const speakBtn = e.target.closest(".speak-msg-btn");
       if (speakBtn) {
-        const textToSpeak = speakBtn.dataset.rawText || "";
-        this.ui.speakText(textToSpeak);
+        const textToSpeak = decodeURIComponent(speakBtn.dataset.rawText || "");
+        if (window.speechSynthesis && window.speechSynthesis.speaking) {
+          window.speechSynthesis.cancel();
+          document.querySelectorAll(".speak-msg-btn").forEach(b => {
+            b.classList.remove("active-speaking");
+            b.innerHTML = "🔊 Read Aloud";
+          });
+        } else {
+          document.querySelectorAll(".speak-msg-btn").forEach(b => {
+            b.classList.remove("active-speaking");
+            b.innerHTML = "🔊 Read Aloud";
+          });
+          speakBtn.classList.add("active-speaking");
+          speakBtn.innerHTML = "⏹️ Stop";
+          this.ui.speakText(textToSpeak, () => {
+            speakBtn.classList.remove("active-speaking");
+            speakBtn.innerHTML = "🔊 Read Aloud";
+          });
+        }
         return;
       }
     });
@@ -240,6 +285,11 @@ class MedGeminiApp {
       this.updateModelStatusBadge(health);
       await this.loadSamplePrompts();
       await this.loadHistorySessions();
+
+      // If user had a previously opened consultation, restore it
+      if (this.sessionId) {
+        await this.loadSession(this.sessionId);
+      }
     } catch (e) {
       console.error("Initialization error:", e);
     }
@@ -247,6 +297,11 @@ class MedGeminiApp {
 
   updateModelStatusBadge(health = null) {
     if (!this.modelPillText || !this.modelStatusDot) return;
+    const bookCount = (health && health.indexed_books_count) || 6;
+    if (this.headerBookCount) {
+      this.headerBookCount.textContent = bookCount;
+    }
+
     if (this.settings.provider === "gemini") {
       const hasKey = !!this.settings.geminiKey;
       this.modelPillText.textContent = hasKey ? "Google Gemini 2.0 Flash" : "Google Gemini (Key Required)";
@@ -256,8 +311,7 @@ class MedGeminiApp {
       this.modelPillText.textContent = hasKey ? "Groq Cloud AI (Llama 3.3 70B)" : "Groq Cloud AI (Key Required)";
       this.modelStatusDot.style.backgroundColor = "#8b5cf6";
     } else {
-      const count = (health && health.indexed_books_count) || 7;
-      this.modelPillText.textContent = `MedGemini Grounded Engine (${count} Books)`;
+      this.modelPillText.textContent = `MedGemini Grounded Engine (${bookCount} Books)`;
       this.modelStatusDot.style.backgroundColor = "#10b981";
     }
   }
@@ -298,21 +352,40 @@ class MedGeminiApp {
       const sessions = await this.api.getSessions();
       if (!this.historyList) return;
 
-      if (sessions.length === 0) {
-        this.historyList.innerHTML = `<div style="font-size:0.75rem; color:var(--text-muted); padding:6px 12px;">No prior consultations.</div>`;
+      if (!sessions || sessions.length === 0) {
+        this.historyList.innerHTML = `<div style="font-size:0.75rem; color:var(--text-muted); padding:8px 12px;">No prior consultations.</div>`;
         return;
       }
 
       this.historyList.innerHTML = sessions.map(s => `
         <div class="history-item ${s.session_id === this.sessionId ? 'active' : ''}" data-session-id="${s.session_id}">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
-          <span style="overflow:hidden; text-overflow:ellipsis;">${s.title}</span>
+          <svg class="history-icon" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+          <span class="history-title" title="${this.escapeHtml(s.title)}">${this.escapeHtml(s.title)}</span>
+          <button class="delete-session-btn" data-session-id="${s.session_id}" title="Delete consultation">✕</button>
         </div>
       `).join("");
 
       this.historyList.querySelectorAll(".history-item").forEach(item => {
-        item.addEventListener("click", () => {
+        item.addEventListener("click", (e) => {
+          if (e.target.closest(".delete-session-btn")) return;
           this.loadSession(item.dataset.sessionId);
+        });
+      });
+
+      this.historyList.querySelectorAll(".delete-session-btn").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          const sid = btn.dataset.sessionId;
+          try {
+            await this.api.deleteSession(sid);
+            if (this.sessionId === sid) {
+              this.startNewChat();
+            }
+            await this.loadHistorySessions();
+            this.showToast("Consultation removed", "info");
+          } catch (err) {
+            console.error("Failed to delete session", err);
+          }
         });
       });
     } catch (e) {
@@ -324,17 +397,23 @@ class MedGeminiApp {
     this.sessionId = sessionId;
     localStorage.setItem("medgemini_session_id", sessionId);
 
-    this.historyList.querySelectorAll(".history-item").forEach(item => {
+    this.historyList?.querySelectorAll(".history-item").forEach(item => {
       item.classList.toggle("active", item.dataset.sessionId === sessionId);
     });
 
     try {
       const data = await this.api.getSessionMessages(sessionId);
-      this.welcomeHero.style.display = "none";
       
       // Clear current messages
       const existingRows = this.chatScrollArea.querySelectorAll(".message-row");
       existingRows.forEach(r => r.remove());
+
+      if (!data.messages || data.messages.length === 0) {
+        this.welcomeHero.style.display = "flex";
+        return;
+      }
+
+      this.welcomeHero.style.display = "none";
 
       data.messages.forEach(msg => {
         if (msg.role === "user") {
@@ -347,6 +426,7 @@ class MedGeminiApp {
       this.scrollToBottom();
     } catch (e) {
       console.error("Error loading session messages:", e);
+      this.startNewChat();
     }
   }
 
@@ -394,12 +474,10 @@ class MedGeminiApp {
 
       const resp = await this.api.sendChatMessage(payload);
 
-      // Save session id
-      if (!this.sessionId && resp.session_id) {
-        this.sessionId = resp.session_id;
-        localStorage.setItem("medgemini_session_id", this.sessionId);
-        await this.loadHistorySessions();
-      }
+      // Always update active session id & refresh recent consultations list
+      this.sessionId = resp.session_id;
+      localStorage.setItem("medgemini_session_id", this.sessionId);
+      await this.loadHistorySessions();
 
       // Remove loading indicator & display AI message
       loadingRow.remove();
@@ -417,13 +495,22 @@ class MedGeminiApp {
     }
   }
 
+  escapeHtml(text) {
+    if (!text) return "";
+    return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
   appendUserMessage(text) {
     const row = document.createElement("div");
-    row.className = "message-row";
+    row.className = "message-row user-row";
     row.innerHTML = `
-      <div class="message-avatar avatar-user">Dr</div>
-      <div class="message-content-wrapper">
-        <div class="user-message-bubble">${text}</div>
+      <div class="message-content-wrapper user-wrapper">
+        <div class="user-message-bubble">${this.escapeHtml(text)}</div>
       </div>
     `;
     this.chatScrollArea.appendChild(row);
@@ -432,10 +519,17 @@ class MedGeminiApp {
 
   appendAIMessage(rawAnswer, citations = [], providerUsed = "offline") {
     const row = document.createElement("div");
-    row.className = "message-row";
+    row.className = "message-row ai-row";
 
     const formattedHtml = this.ui.renderMarkdown(rawAnswer, citations);
     const referencesHtml = this.ui.renderReferencesCard(citations);
+
+    let providerLabel = "📚 Grounded Engine";
+    if (providerUsed === "groq" || providerUsed.toLowerCase().includes("groq")) {
+      providerLabel = "⚡ Groq Cloud";
+    } else if (providerUsed === "gemini" || providerUsed.toLowerCase().includes("gemini")) {
+      providerLabel = "✨ Gemini 2.0";
+    }
 
     row.innerHTML = `
       <div class="message-avatar avatar-ai">
@@ -447,14 +541,14 @@ class MedGeminiApp {
         </div>
         ${referencesHtml}
         <div class="message-actions">
-          <button class="msg-action-btn copy-msg-btn" data-raw-text="${encodeURIComponent(rawAnswer)}">
+          <button class="msg-action-btn copy-msg-btn" data-raw-text="${encodeURIComponent(rawAnswer)}" title="Copy response to notes">
             📋 Copy
           </button>
-          <button class="msg-action-btn speak-msg-btn" data-raw-text="${encodeURIComponent(rawAnswer)}">
+          <button class="msg-action-btn speak-msg-btn" data-raw-text="${encodeURIComponent(rawAnswer)}" title="Listen to response">
             🔊 Read Aloud
           </button>
-          <span style="font-size: 0.7rem; color: var(--text-muted); margin-left: auto;">
-            Powered by ${providerUsed}
+          <span class="model-provider-badge">
+            ${providerLabel}
           </span>
         </div>
       </div>
@@ -508,6 +602,21 @@ class MedGeminiApp {
 
     this.settingsModal.classList.remove("active");
     this.updateModelStatusBadge();
+    this.showToast("Settings & model engine updated!", "success");
+  }
+
+  showToast(message, type = "info") {
+    if (!this.toastContainer) return;
+    const toast = document.createElement("div");
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `<span>${message}</span>`;
+    this.toastContainer.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = "0";
+      toast.style.transform = "translateY(8px)";
+      toast.style.transition = "all 0.25s ease";
+      setTimeout(() => toast.remove(), 250);
+    }, 2800);
   }
 
 

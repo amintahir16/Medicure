@@ -299,6 +299,10 @@ class MBBSGenerator:
             answer_text = self._generate_offline_grounded_response(query, evidence, study_mode)
             provider_used = "MedGemini Built-in Grounded Engine (Offline)"
 
+        # Step 4.5: Normalize citation brackets (convert 【Ref 1】, ［Ref 1］, (Ref 1) to [Ref 1])
+        answer_text = re.sub(r'[【［〔(]\s*Ref\.?\s*(\d+)\s*[】］〕)]', r'[Ref \1]', answer_text, flags=re.IGNORECASE)
+        answer_text = re.sub(r'Ref\.?\s*[【［〔(]\s*(\d+)\s*[】］〕)]', r'[Ref \1]', answer_text, flags=re.IGNORECASE)
+
         # Step 5: Extract structured citations
         citations = self._extract_citations(answer_text, evidence)
 
@@ -795,8 +799,8 @@ STRICT INSTRUCTIONS:
     def _extract_citations(self, answer_text: str, evidence: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Parses inline citations and correlates them with exact evidence metadata."""
         found_refs = set()
-        # Match [Ref X] or [Ref X: ...] or Ref [X]
-        matches = re.findall(r'(?:\[Ref\s*(\d+)|Ref\s*\[(\d+)\])', answer_text, re.IGNORECASE)
+        # Match [Ref X], 【Ref X】, Ref [X], (Ref X) etc.
+        matches = re.findall(r'(?:[\[【［〔(]\s*Ref\.?\s*(\d+)|Ref\.?\s*[\[【［〔(]\s*(\d+))', answer_text, re.IGNORECASE)
         for m in matches:
             val = m[0] or m[1]
             try:
@@ -806,11 +810,11 @@ STRICT INSTRUCTIONS:
 
         citations = []
         for ev in evidence:
-            is_cited = ev["ref_index"] in found_refs or ev["ref_index"] == 1
-            if is_cited:
+            is_cited = ev["ref_index"] in found_refs or ev["ref_index"] == 1 or len(found_refs) == 0
+            if is_cited or len(citations) < 3:
                 citations.append({
                     "ref_index": ev["ref_index"],
-                    "is_cited": True,
+                    "is_cited": ev["ref_index"] in found_refs,
                     "book_title": ev["book_title"],
                     "subject": ev["subject"],
                     "mbbs_year": ev["mbbs_year"],

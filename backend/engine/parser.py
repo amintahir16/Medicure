@@ -73,14 +73,24 @@ class PDFBookParser:
                         skip_idx = idx + 1
                     break
 
-            # 2. Identify Topic Heading from the lines immediately following Chapter Title
+            # 2. Identify Topic Heading from lines following Chapter Title (ignoring running headers)
             table_words = {"pillar", "sign", "symptom", "category", "characteristic", 
                            "parameter", "substance", "direction", "lesion", "phase", 
                            "determinant", "pattern", "step", "drug", "generation", "score"}
-            for line in lines[skip_idx:skip_idx+4]:
+            book_lower = book_title.lower()
+            stem_lower = pdf_path.stem.lower()
+
+            for line in lines[skip_idx:skip_idx+6]:
                 line_lower = line.lower()
+                # Skip running headers (e.g., "32 I Handbook of General Anatomy" or containing book title)
+                if (re.match(r'^\d+\s*[\sI\|\-\–\\\/]', line) or 
+                    re.search(r'[\sI\|\-\–\\\/]\s*\d+\s*$', line) or
+                    book_lower in line_lower or stem_lower in line_lower or
+                    "handbook of" in line_lower or "textbook of" in line_lower or "principles of" in line_lower):
+                    continue
+
                 # Must be a valid medical heading: not a sentence, not a page number, not a table column
-                if (len(line) > 8 and len(line) < 110
+                if (len(line) >= 4 and len(line) < 110
                     and not line_lower.startswith("page ")
                     and not line_lower.startswith("chapter ")
                     and not line_lower.startswith("clinical pearl")

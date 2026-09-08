@@ -86,74 +86,9 @@ class MBBSIndexer:
     def index_book(self, pdf_path: Path) -> int:
         """Parses a single PDF book and indexes all pages into SQLite FTS5."""
         pdf_path = Path(pdf_path)
-        pages_data = []
-
-        # Check if official curriculum catalog exists for this book
-        catalog_path = Path("data/curriculum_catalog.json")
-        if catalog_path.exists():
-            import json
-            try:
-                with open(catalog_path, "r", encoding="utf-8") as f:
-                    catalog = json.load(f)
-                if pdf_path.name in catalog:
-                    cat_entry = catalog[pdf_path.name]
-                    book_title = cat_entry["book_title"]
-                    subject = cat_entry["subject"]
-                    mbbs_year = cat_entry["mbbs_year"]
-
-                    total_pages = 1
-                    for chap in cat_entry["chapters"]:
-                        total_pages += len(chap["topics"])
-
-                    # Cover page
-                    pages_data.append({
-                        "book_title": book_title,
-                        "subject": subject,
-                        "mbbs_year": mbbs_year,
-                        "chapter": "Curriculum Reference Overview",
-                        "topic": book_title,
-                        "page_number": 1,
-                        "physical_page": 1,
-                        "total_book_pages": total_pages,
-                        "content": f"{book_title}. {subject} ({mbbs_year}). Standard MBBS Core Curriculum Clinical Reference.",
-                        "raw_excerpt": f"{book_title}. {subject} ({mbbs_year}). Standard MBBS Core Curriculum Clinical Reference.",
-                        "table_json": None
-                    })
-
-                    current_page = 2
-                    for chap in cat_entry["chapters"]:
-                        for topic in chap["topics"]:
-                            content_parts = []
-                            content_parts.extend(topic["paragraphs"])
-                            if "pearl" in topic:
-                                content_parts.append(f"Clinical Pearl: {topic['pearl']}")
-                            if "table" in topic and "data" in topic["table"]:
-                                table_lines = [" ".join(row) for row in topic["table"]["data"]]
-                                content_parts.append("Diagnostic & Management Matrix: " + " | ".join(table_lines))
-
-                            full_content = "\n\n".join(content_parts)
-                            pages_data.append({
-                                "book_title": book_title,
-                                "subject": subject,
-                                "mbbs_year": mbbs_year,
-                                "chapter": chap["chapter_title"],
-                                "topic": topic["topic_title"],
-                                "page_number": current_page,
-                                "physical_page": current_page,
-                                "total_book_pages": total_pages,
-                                "content": full_content,
-                                "raw_excerpt": topic["paragraphs"][0][:350] + "...",
-                                "table_json": json.dumps(topic.get("table", {})) if "table" in topic else None
-                            })
-                            current_page += 1
-            except Exception as e:
-                print(f"Notice: Loading catalog for {pdf_path.name} failed ({e}), falling back to PDF parser.")
-                pages_data = []
-
-        if not pages_data:
-            pages_data = self.parser.parse_book(pdf_path)
-            for item in pages_data:
-                item["table_json"] = None
+        pages_data = self.parser.parse_book(pdf_path)
+        for item in pages_data:
+            item["table_json"] = None
 
         if not pages_data:
             return 0
@@ -241,6 +176,32 @@ class MBBSIndexer:
                 print(f"Error indexing {pdf_file.name}: {e}")
                 results[pdf_file.name] = 0
         return results
+
+    def sync_books_dir(self, books_dir: Path = BOOKS_DIR) -> Dict[str, int]:
+        """
+        Scans the books directory and automatically parses and indexes any newly
+        added PDF files that have not yet been registered in the database.
+        """
+        books_dir = Path(books_dir)
+        if not books_dir.exists():
+            return {}
+
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT filename FROM registered_books")
+            registered = {row["filename"] for row in cursor.fetchall()}
+
+        newly_indexed = {}
+        for pdf_file in books_dir.glob("*.pdf"):
+            if pdf_file.name not in registered:
+                print(f"Detected new textbook '{pdf_file.name}', indexing...")
+                try:
+                    count = self.index_book(pdf_file)
+                    newly_indexed[pdf_file.name] = count
+                except Exception as e:
+                    print(f"Error auto-indexing {pdf_file.name}: {e}")
+                    newly_indexed[pdf_file.name] = 0
+        return newly_indexed
 
     def get_books_summary(self) -> List[Dict[str, Any]]:
         """Returns list of all indexed medical textbooks with metadata."""

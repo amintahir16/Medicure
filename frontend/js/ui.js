@@ -39,10 +39,10 @@ export class MedGeminiUI {
     html = html.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
     html = html.replace(/\*(.*?)\*/gim, '<em>$1</em>');
 
-    // 5. Tables
+    // 5. Tables (wrapped in responsive scrollable container)
     html = this._parseMarkdownTables(html);
 
-    // 6. Ordered & Unordered Lists
+    // 6. Ordered & Unordered Lists (with nested sub-bullet support)
     html = this._parseMarkdownLists(html);
 
     // 7. Paragraphs
@@ -51,6 +51,7 @@ export class MedGeminiUI {
       .map(para => {
         para = para.trim();
         if (para.startsWith('<h') || para.startsWith('<table') || 
+            para.startsWith('<div class="table-responsive-wrapper"') ||
             para.startsWith('<ul') || para.startsWith('<ol') || para.startsWith('<blockquote')) {
           return para;
         }
@@ -67,15 +68,48 @@ export class MedGeminiUI {
   _parseMarkdownLists(text) {
     const lines = text.split('\n');
     let inUl = false;
+    let inSubUl = false;
     let inOl = false;
     let result = [];
 
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-      const ulMatch = line.match(/^[-*]\s+(.*)$/);
-      const olMatch = line.match(/^(\d+)\.\s+(.*)$/);
+    const closeSubUl = () => {
+      if (inSubUl) {
+        result.push('</ul></li>');
+        inSubUl = false;
+      }
+    };
 
-      if (ulMatch) {
+    const closeAll = () => {
+      closeSubUl();
+      if (inUl) {
+        result.push('</ul>');
+        inUl = false;
+      }
+      if (inOl) {
+        result.push('</ol>');
+        inOl = false;
+      }
+    };
+
+    for (let i = 0; i < lines.length; i++) {
+      const rawLine = lines[i];
+      const trimmed = rawLine.trim();
+
+      // Check for indented sub-bullet: indented with 2+ spaces or tabs, starting with -, *, or •
+      const subUlMatch = rawLine.match(/^(?:[ \t]{2,})[-*•]\s+(.*)$/);
+      // Top level bullet
+      const topUlMatch = trimmed.match(/^[-*•]\s+(.*)$/);
+      // Numbered item
+      const olMatch = trimmed.match(/^(\d+)\.\s+(.*)$/);
+
+      if (subUlMatch && (inUl || inOl)) {
+        if (!inSubUl) {
+          result.push('<ul class="sub-list">');
+          inSubUl = true;
+        }
+        result.push(`<li>${subUlMatch[1]}</li>`);
+      } else if (topUlMatch) {
+        closeSubUl();
         if (inOl) {
           result.push('</ol>');
           inOl = false;
@@ -84,8 +118,9 @@ export class MedGeminiUI {
           result.push('<ul>');
           inUl = true;
         }
-        result.push(`<li>${ulMatch[1]}</li>`);
+        result.push(`<li>${topUlMatch[1]}</li>`);
       } else if (olMatch) {
+        closeSubUl();
         if (inUl) {
           result.push('</ul>');
           inUl = false;
@@ -96,19 +131,11 @@ export class MedGeminiUI {
         }
         result.push(`<li>${olMatch[2]}</li>`);
       } else {
-        if (inUl) {
-          result.push('</ul>');
-          inUl = false;
-        }
-        if (inOl) {
-          result.push('</ol>');
-          inOl = false;
-        }
-        result.push(lines[i]);
+        closeAll();
+        result.push(rawLine);
       }
     }
-    if (inUl) result.push('</ul>');
-    if (inOl) result.push('</ol>');
+    closeAll();
     return result.join('\n');
   }
 
@@ -128,13 +155,13 @@ export class MedGeminiUI {
         const cells = line.split('|').slice(1, -1).map(c => c.trim());
         if (!inTable) {
           inTable = true;
-          tableHtml = '<table><thead><tr>' + cells.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>';
+          tableHtml = '<div class="table-responsive-wrapper"><table><thead><tr>' + cells.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>';
         } else {
           tableHtml += '<tr>' + cells.map(c => `<td>${c}</td>`).join('') + '</tr>';
         }
       } else {
         if (inTable) {
-          tableHtml += '</tbody></table>';
+          tableHtml += '</tbody></table></div>';
           result.push(tableHtml);
           inTable = false;
         }
@@ -142,7 +169,7 @@ export class MedGeminiUI {
       }
     }
     if (inTable) {
-      tableHtml += '</tbody></table>';
+      tableHtml += '</tbody></table></div>';
       result.push(tableHtml);
     }
     return result.join('\n');
@@ -155,17 +182,30 @@ export class MedGeminiUI {
       citMap[c.ref_index] = c;
     });
 
-    // Pattern: [Ref X] or [Ref X: ...] or Ref [X] or [Ref X, p. Y]
-    return html.replace(/(?:\[Ref\s*(\d+)(?::\s*([^\]]+))?\]|Ref\s*\[(\d+)\])/gi, (match, p1, p2, p3) => {
+    // Pattern matching all bracket variants: [Ref 1], 【Ref 1】, 【Ref1】, Ref [1], ［Ref 1］, (Ref 1), etc.
+    const pattern = /(?:[\[【［〔(]\s*Ref\.?\s*(\d+)(?::\s*([^\]】］〕)]+))?\s*[\]】］〕)]|Ref\.?\s*[\[【［〔(]\s*(\d+)\s*[\]】］〕)])/gi;
+
+    return html.replace(pattern, (match, p1, p2, p3) => {
       const idx = parseInt(p1 || p3, 10);
-      const cit = citMap[idx];
-      let bookTitle = cit ? cit.book_title : "MBBS Textbook";
+      let cit = citMap[idx];
+
+      // Smart fallback: if citMap[idx] is missing, use citations by index or first available citation
+      if (!cit && citations && citations.length > 0) {
+        if (citations[idx - 1]) {
+          cit = citations[idx - 1];
+        } else {
+          cit = citations[0];
+        }
+      }
+
+      let bookTitle = cit ? cit.book_title : "Textbook";
       let pageNum = cit ? cit.page_number : 1;
+      let excerpt = cit ? (cit.excerpt || "") : "";
 
       if (!cit && p2) {
         const cleanDetails = p2.replace(/<[^>]+>/g, "").trim();
         const parts = cleanDetails.split("|").map(s => s.trim());
-        bookTitle = parts[0] || "MBBS Textbook";
+        bookTitle = parts[0] || "Textbook";
         const pageMatch = cleanDetails.match(/(?:p\.|page)\s*(\d+)/i);
         if (pageMatch) {
           pageNum = parseInt(pageMatch[1], 10);
@@ -175,8 +215,8 @@ export class MedGeminiUI {
       // Sleek, compact badge: Ref [1] • p. 6
       const badgeText = `Ref [${idx}] • p. ${pageNum}`;
 
-      return `<button class="citation-pill" data-ref-idx="${idx}" data-book="${encodeURIComponent(bookTitle)}" data-page="${pageNum}" title="Inspect ${bookTitle}, Page ${pageNum}">
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+      return `<button class="citation-pill" data-ref-idx="${idx}" data-book="${encodeURIComponent(bookTitle)}" data-page="${pageNum}" data-excerpt="${encodeURIComponent(excerpt)}" title="Inspect ${bookTitle}, Page ${pageNum}">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
         ${badgeText}
       </button>`;
     });
@@ -201,7 +241,7 @@ export class MedGeminiUI {
             </div>
             <div class="ref-quote-box">"${c.excerpt || ''}"</div>
           </div>
-          <button class="ref-inspect-btn" data-book="${encodeURIComponent(c.book_title)}" data-page="${c.page_number}">
+          <button class="ref-inspect-btn" data-book="${encodeURIComponent(c.book_title)}" data-page="${c.page_number}" data-excerpt="${encodeURIComponent(c.excerpt || '')}">
             📖 Inspect Page
           </button>
         </div>
@@ -229,10 +269,11 @@ export class MedGeminiUI {
   /**
    * Speaks the response aloud using Web Speech API
    */
-  speakText(text) {
+  speakText(text, onEnd = null) {
     if (!this.speechSynth) return;
     if (this.speechSynth.speaking) {
       this.speechSynth.cancel();
+      if (onEnd) onEnd();
       return;
     }
     // Clean markdown tags
@@ -240,6 +281,10 @@ export class MedGeminiUI {
     const utterance = new SpeechSynthesisUtterance(plain);
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
+    if (onEnd) {
+      utterance.onend = onEnd;
+      utterance.onerror = onEnd;
+    }
     this.speechSynth.speak(utterance);
   }
 

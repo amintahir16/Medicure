@@ -59,6 +59,18 @@ class MBBSMemoryManager:
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
             """)
+            
+            # Backfill migration: ensure all historic conversations in chat_messages have chat_sessions records
+            cursor.execute("""
+                INSERT OR IGNORE INTO chat_sessions (session_id, title, created_at, updated_at)
+                SELECT 
+                    session_id,
+                    SUBSTR(COALESCE((SELECT content FROM chat_messages m2 WHERE m2.session_id = m1.session_id AND m2.role = 'user' ORDER BY id ASC LIMIT 1), 'Medical Consultation'), 1, 45) as title,
+                    MIN(created_at) as created_at,
+                    MAX(created_at) as updated_at
+                FROM chat_messages m1
+                GROUP BY session_id;
+            """)
             conn.commit()
 
     def create_session(self, session_id: str, title: str = "New Medical Consultation", mbbs_year: str = "all", subject: str = "all"):
@@ -79,16 +91,43 @@ class MBBSMemoryManager:
                 VALUES (?, ?, ?, ?, ?)
             """, (session_id, role, content, cit_json, provider_used))
             
-            # Update session timestamp and title if first user message
-            if role == "user":
+            # Format clean title from first user message
+            title_candidate = content.strip().replace("\n", " ")
+            if len(title_candidate) > 42:
+                title_candidate = title_candidate[:42] + "..."
+            
+            # Check if session exists in chat_sessions
+            cursor.execute("SELECT session_id, title FROM chat_sessions WHERE session_id = ?", (session_id,))
+            session_row = cursor.fetchone()
+            
+            if not session_row:
+                init_title = title_candidate if role == "user" else "Medical Consultation"
+                cursor.execute("""
+                    INSERT INTO chat_sessions (session_id, title, updated_at)
+                    VALUES (?, ?, CURRENT_TIMESTAMP)
+                """, (session_id, init_title))
+            elif role == "user" and session_row["title"] in ("New Medical Consultation", "Medical Consultation", "hello", "Hello"):
                 cursor.execute("""
                     UPDATE chat_sessions 
-                    SET title = CASE WHEN title = 'New Medical Consultation' THEN ? ELSE title END,
-                        updated_at = CURRENT_TIMESTAMP
+                    SET title = ?, updated_at = CURRENT_TIMESTAMP
                     WHERE session_id = ?
-                """, (content[:45] + "..." if len(content) > 45 else content, session_id))
+                """, (title_candidate, session_id))
+            else:
+                cursor.execute("""
+                    UPDATE chat_sessions 
+                    SET updated_at = CURRENT_TIMESTAMP
+                    WHERE session_id = ?
+                """, (session_id,))
             
             conn.commit()
+
+    def delete_session(self, session_id: str) -> bool:
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM chat_messages WHERE session_id = ?", (session_id,))
+            cursor.execute("DELETE FROM chat_sessions WHERE session_id = ?", (session_id,))
+            conn.commit()
+            return True
 
     def get_messages(self, session_id: str) -> List[Dict[str, Any]]:
         with self.get_connection() as conn:
@@ -118,6 +157,6 @@ class MBBSMemoryManager:
                 SELECT session_id, title, mbbs_year, subject, created_at, updated_at
                 FROM chat_sessions
                 ORDER BY updated_at DESC
-                LIMIT 30
+                LIMIT 50
             """)
             return [dict(r) for r in cursor.fetchall()]

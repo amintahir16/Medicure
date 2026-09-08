@@ -51,13 +51,12 @@ retriever = MBBSHybridRetriever()
 generator = MBBSGenerator(retriever=retriever)
 memory = MBBSMemoryManager()
 
-# Ensure seed books are indexed on startup
+# Auto-sync real textbooks on startup
 @app.on_event("startup")
 async def startup_event():
-    books_summary = indexer.get_books_summary()
-    if len(books_summary) < 6:
-        print("Indexing foundational MBBS textbooks...")
-        indexer.index_all_books()
+    new_books = indexer.sync_books_dir()
+    if new_books:
+        print(f"Auto-indexed new textbooks: {list(new_books.keys())}")
     print(f"MedGemini Server ready. {len(indexer.get_books_summary())} MBBS books indexed.")
 
 
@@ -167,8 +166,14 @@ async def create_session(req: SessionCreateRequest):
     )
     return {"session_id": new_id, "title": req.title}
 
+@app.delete("/api/sessions/{session_id}")
+async def delete_session(session_id: str):
+    memory.delete_session(session_id)
+    return {"status": "deleted", "session_id": session_id}
+
 @app.get("/api/books")
 async def get_books():
+    indexer.sync_books_dir()
     books = indexer.get_books_summary()
     return {"books": books, "total_count": len(books)}
 

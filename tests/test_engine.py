@@ -23,47 +23,30 @@ from backend.engine.generator import MBBSGenerator
 def test_textbook_indexing_count():
     indexer = MBBSIndexer()
     summary = indexer.get_books_summary()
-    assert len(summary) >= 6, f"Expected at least 6 MBBS books, found {len(summary)}"
+    assert len(summary) >= 1, f"Expected at least 1 MBBS textbook, found {len(summary)}"
     
-    subjects = {b["subject"] for b in summary}
-    expected_subjects = {"Anatomy", "Physiology", "Pathology", "Pharmacology", "Internal Medicine", "General Surgery"}
-    for subj in expected_subjects:
-        assert subj in subjects, f"Missing core curriculum subject: {subj}"
-    print("[PASS] Multi-year textbook indexing verified.")
+    titles = [b["book_title"] for b in summary]
+    assert any("Chaurasia" in t for t in titles), f"BD Chaurasia not found in summary: {titles}"
+    print("[PASS] Real MBBS textbook indexing verified.")
 
 def test_exact_citations_retrieval():
     retriever = MBBSHybridRetriever()
     
-    # Test 1: Cardiac Cycle (Physiology Year 1)
-    cardiac_results = retriever.search("phases of cardiac cycle Wiggers diagram S1 S2", top_k=3)
-    assert len(cardiac_results) > 0
-    top_cardiac = cardiac_results[0]
-    assert "Physiology" in top_cardiac["subject"]
-    assert top_cardiac["page_number"] in [2, 3]
-    assert "Chapter 1" in top_cardiac["chapter"]
+    # Test 1: Classification of bones (Anatomy)
+    bone_results = retriever.search("classification of bones according to shape diaphysis epiphysis", top_k=3)
+    assert len(bone_results) > 0, "Failed to retrieve bone classification from BD Chaurasia"
+    top_bone = bone_results[0]
+    assert "Anatomy" in top_bone["subject"]
+    assert any("Chaurasia" in b["book_title"] for b in bone_results)
 
-    # Test 2: ACE Inhibitor cough (Pharmacology Year 2)
-    ace_results = retriever.search("ACE inhibitors persistent dry cough bradykinin", top_k=3)
-    assert len(ace_results) > 0
-    top_ace = ace_results[0]
-    assert "Pharmacology" in top_ace["subject"]
-    assert top_ace["page_number"] in [2, 3]
-    assert "Tripathi" in top_ace["book_title"]
+    # Test 2: Sprain and Ligaments (Anatomy)
+    sprain_results = retriever.search("sprain undue stretching tearing of fibres of ligament", top_k=3)
+    assert len(sprain_results) > 0, "Failed to retrieve ligament / sprain anatomy"
+    top_sprain = sprain_results[0]
+    assert "Anatomy" in top_sprain["subject"]
+    assert top_sprain["page_number"] > 0
 
-    # Test 3: Erb's Palsy (Anatomy Year 1)
-    erb_results = retriever.search("Erb palsy waiter tip brachial plexus C5 C6", top_k=3)
-    assert len(erb_results) > 0
-    top_erb = erb_results[0]
-    assert "Anatomy" in top_erb["subject"]
-    assert top_erb["page_number"] == 2
-
-    # Test 4: Tension Pneumothorax (General Surgery Year 4/5)
-    trauma_results = retriever.search("ATLS primary survey tension pneumothorax needle decompression", top_k=3)
-    assert len(trauma_results) > 0
-    top_trauma = trauma_results[0]
-    assert "Surgery" in top_trauma["subject"]
-
-    print("[PASS] Exact retrieval and citation verification passed across all tested subjects.")
+    print("[PASS] Exact retrieval and citation verification passed across textbook content.")
 
 def test_page_content_retrieval():
     indexer = MBBSIndexer()
@@ -71,17 +54,18 @@ def test_page_content_retrieval():
     assert len(books) > 0
     first_book = books[0]["book_title"]
     
-    page_data = indexer.get_page_content(first_book, 2)
-    assert page_data, f"Failed to retrieve page 2 for {first_book}"
+    page_data = indexer.get_page_content(first_book, 44)
+    assert page_data, f"Failed to retrieve page 44 for {first_book}"
     assert "content" in page_data
-    assert len(page_data["content"]) > 100
-    assert page_data["page_number"] == 2
-    print("[PASS] Page content retrieval verified.")
+    assert len(page_data["content"]) > 50
+    assert page_data["page_number"] == 44
+    assert "BONES" in page_data["content"] or "CLASSIFICATION" in page_data["content"]
+    print("[PASS] Real page content retrieval verified.")
 
 def test_grounded_generator_response():
     generator = MBBSGenerator()
     result = asyncio.run(generator.generate_response(
-        query="What is the Alvarado score and McBurney point in acute appendicitis?",
+        query="What is the classification of bones according to shape in anatomy?",
         provider="offline"
     ))
     
@@ -91,41 +75,17 @@ def test_grounded_generator_response():
     
     # Check that answer contains clean inline reference and clinical content
     assert "[Ref 1]" in result["answer"]
-    assert any(term in result["answer"].lower() for term in ["alvarado", "appendicitis", "diagnostic", "management"])
+    assert any(term in result["answer"].lower() for term in ["bone", "long", "shape", "epiphysis", "shaft"])
     
     # Check citation contents
     first_cit = result["citations"][0]
-    assert "Surgery" in first_cit["subject"]
-    assert "Alvarado" in result["answer"] or "appendicitis" in result["answer"].lower()
-    print("[PASS] Grounded response generation with inline and block references verified.")
-
-def test_meningitis_comprehensive_response():
-    generator = MBBSGenerator()
-    result = asyncio.run(generator.generate_response(
-        query="thell me about meningitis",
-        provider="offline"
-    ))
-    
-    assert "answer" in result
-    answer = result["answer"]
-    # Check that answer is properly titled with Meningitis and citations have Internal Medicine
-    assert "Meningitis" in answer
-    assert "Principles of Internal Medicine" in result["citations"][0]["book_title"]
-    # Check classic clinical features
-    assert any(k in answer for k in ["nuchal rigidity", "Kernig", "Brudzinski", "neck stiffness", "CSF"])
-    # Check CSF table is rendered
-    assert "| Normal CSF |" in answer or "Diagnostic Parameter" in answer
-    # Check therapeutics
-    assert any(abx in answer for abx in ["Ceftriaxone", "Vancomycin", "Ampicillin"])
-    # Check cross-disciplinary citations
-    assert "[Ref 1" in answer
-    assert "[Ref 2" in answer
-    print("[PASS] Meningitis comprehensive clinical consultation verified with CSF table and multidisciplinary grounding.")
+    assert "Anatomy" in first_cit["subject"]
+    assert "Chaurasia" in first_cit["book_title"]
+    print("[PASS] Grounded response generation with real textbook citations verified.")
 
 if __name__ == "__main__":
     test_textbook_indexing_count()
     test_exact_citations_retrieval()
     test_page_content_retrieval()
     test_grounded_generator_response()
-    test_meningitis_comprehensive_response()
     print("\nALL ENGINE INTEGRATION TESTS PASSED 100%!")
