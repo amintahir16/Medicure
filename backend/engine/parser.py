@@ -42,9 +42,17 @@ class PDFBookParser:
 
         for page_idx, page in enumerate(reader.pages):
             page_num = page_idx + 1  # 1-indexed physical page
-            raw_text = page.extract_text() or ""
+            try:
+                raw_text = page.extract_text() or ""
+            except Exception as e:
+                print(f"Warning: error reading page {page_num} in {pdf_path.name}: {e}")
+                continue
+
             if not raw_text.strip():
                 continue
+
+            if page_num % 50 == 0 or page_num == total_pages:
+                print(f"Parsing '{book_title}': page {page_num}/{total_pages}...")
 
             # Detect chapter and topic headers from first 8 lines
             lines = [l.strip() for l in raw_text.split('\n') if l.strip()]
@@ -145,8 +153,6 @@ class PDFBookParser:
             return "Pharmacology"
         elif "surg" in combined or "trauma" in combined:
             return "General Surgery"
-        elif "medicine" in combined or "clinical" in combined:
-            return "Internal Medicine"
         elif "microbio" in combined or "immune" in combined:
             return "Microbiology"
         elif "biochem" in combined:
@@ -155,6 +161,22 @@ class PDFBookParser:
             return "Pediatrics"
         elif "gynecol" in combined or "obstet" in combined:
             return "Obstetrics and Gynecology"
+        elif "forensic" in combined or "toxicolog" in combined:
+            return "Forensic Medicine"
+        elif "community" in combined or "preventive" in combined or "psm" in combined or "public health" in combined:
+            return "Community Medicine"
+        elif "ophthal" in combined or "eye" in combined:
+            return "Ophthalmology"
+        elif "ent" in combined or "otolaryng" in combined or "ear" in combined:
+            return "Otorhinolaryngology (ENT)"
+        elif "ortho" in combined:
+            return "Orthopedics"
+        elif "derma" in combined or "skin" in combined:
+            return "Dermatology"
+        elif "psychiat" in combined:
+            return "Psychiatry"
+        elif "medicine" in combined or "clinical" in combined or "internal" in combined:
+            return "Internal Medicine"
         return "Internal Medicine"
 
     def _clean_medical_text(self, text: str) -> str:

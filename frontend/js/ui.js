@@ -15,20 +15,25 @@ export class MedGeminiUI {
 
     let html = text;
 
+    // 0. Strip redundant duplicate text-based references sections dumped by LLMs
+    html = html.replace(/\n*#{2,4}\s*(?:Verified\s+)?(?:Textbook\s+)?References[\s\S]*$/i, '');
+    html = html.replace(/\n*\*{2}References:?\*{2}[\s\S]*$/i, '');
+
     // 1. Sanitize HTML tags except our custom spans
     html = html
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
 
-    // 2. Headings
+    // 2. Headings (h4, h3, h2)
+    html = html.replace(/^#### (.*$)/gim, '<h4>$1</h4>');
     html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
     html = html.replace(/^## (.*$)/gim, '<h3>$1</h3>');
     html = html.replace(/^# (.*$)/gim, '<h2>$1</h2>');
 
     // 3. Blockquotes / Clinical Pearls
-    html = html.replace(/^\&gt;\s*💡\s*(.*?)$/gim, '<blockquote>💡 $1</blockquote>');
-    html = html.replace(/^\&gt;\s*(.*?)$/gim, '<blockquote>$1</blockquote>');
+    html = html.replace(/^&gt;\s*💡\s*(.*?)$/gim, '<blockquote>💡 $1</blockquote>');
+    html = html.replace(/^&gt;\s*(.*?)$/gim, '<blockquote>$1</blockquote>');
 
     // 4. Bold & Italic
     html = html.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
@@ -37,10 +42,8 @@ export class MedGeminiUI {
     // 5. Tables
     html = this._parseMarkdownTables(html);
 
-    // 6. Bullet lists
-    html = html.replace(/^\s*-\s+(.*$)/gim, '<li>$1</li>');
-    html = html.replace(/(<li>.*<\/li>)/gim, '<ul>$1</ul>');
-    html = html.replace(/<\/ul>\s*<ul>/gim, ''); // Merge adjacent <ul>
+    // 6. Ordered & Unordered Lists
+    html = this._parseMarkdownLists(html);
 
     // 7. Paragraphs
     html = html
@@ -48,17 +51,65 @@ export class MedGeminiUI {
       .map(para => {
         para = para.trim();
         if (para.startsWith('<h') || para.startsWith('<table') || 
-            para.startsWith('<ul') || para.startsWith('<blockquote')) {
+            para.startsWith('<ul') || para.startsWith('<ol') || para.startsWith('<blockquote')) {
           return para;
         }
         return `<p>${para.replace(/\n/g, '<br>')}</p>`;
       })
       .join('\n');
 
-    // 8. Transform Citations: [Ref X: ... | Page Y] into interactive badges
+    // 8. Transform Citations: [Ref X] into interactive badges
     html = this._replaceCitationBadges(html, citations);
 
     return html;
+  }
+
+  _parseMarkdownLists(text) {
+    const lines = text.split('\n');
+    let inUl = false;
+    let inOl = false;
+    let result = [];
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      const ulMatch = line.match(/^[-*]\s+(.*)$/);
+      const olMatch = line.match(/^(\d+)\.\s+(.*)$/);
+
+      if (ulMatch) {
+        if (inOl) {
+          result.push('</ol>');
+          inOl = false;
+        }
+        if (!inUl) {
+          result.push('<ul>');
+          inUl = true;
+        }
+        result.push(`<li>${ulMatch[1]}</li>`);
+      } else if (olMatch) {
+        if (inUl) {
+          result.push('</ul>');
+          inUl = false;
+        }
+        if (!inOl) {
+          result.push('<ol>');
+          inOl = true;
+        }
+        result.push(`<li>${olMatch[2]}</li>`);
+      } else {
+        if (inUl) {
+          result.push('</ul>');
+          inUl = false;
+        }
+        if (inOl) {
+          result.push('</ol>');
+          inOl = false;
+        }
+        result.push(lines[i]);
+      }
+    }
+    if (inUl) result.push('</ul>');
+    if (inOl) result.push('</ol>');
+    return result.join('\n');
   }
 
   _parseMarkdownTables(text) {
@@ -104,40 +155,35 @@ export class MedGeminiUI {
       citMap[c.ref_index] = c;
     });
 
-    // Pattern 1: [Ref X: Book Title | Chapter | Topic | Page Y]
-    html = html.replace(/\[Ref\s*(\d+):?\s*([^\]]+)?\]/g, (match, idxStr, details) => {
-      const idx = parseInt(idxStr, 10);
+    // Pattern: [Ref X] or [Ref X: ...] or Ref [X] or [Ref X, p. Y]
+    return html.replace(/(?:\[Ref\s*(\d+)(?::\s*([^\]]+))?\]|Ref\s*\[(\d+)\])/gi, (match, p1, p2, p3) => {
+      const idx = parseInt(p1 || p3, 10);
       const cit = citMap[idx];
       let bookTitle = cit ? cit.book_title : "MBBS Textbook";
       let pageNum = cit ? cit.page_number : 1;
-      let subject = cit ? cit.subject : "";
 
-      if (!cit && details) {
-        // Strip HTML tags and isolate book name
-        const cleanDetails = details.replace(/<[^>]+>/g, "").trim();
+      if (!cit && p2) {
+        const cleanDetails = p2.replace(/<[^>]+>/g, "").trim();
         const parts = cleanDetails.split("|").map(s => s.trim());
         bookTitle = parts[0] || "MBBS Textbook";
-        
-        // Try to extract page number from details (e.g. "p. 345", "Page 2")
         const pageMatch = cleanDetails.match(/(?:p\.|page)\s*(\d+)/i);
         if (pageMatch) {
           pageNum = parseInt(pageMatch[1], 10);
         }
       }
 
-      const badgeText = subject ? `Ref [${idx}] • ${subject} p. ${pageNum}` : `Ref [${idx}] • p. ${pageNum}`;
+      // Sleek, compact badge: Ref [1] • p. 6
+      const badgeText = `Ref [${idx}] • p. ${pageNum}`;
 
-      return `<button class="citation-pill" data-ref-idx="${idx}" data-book="${encodeURIComponent(bookTitle)}" data-page="${pageNum}" title="Click to inspect page ${pageNum} in ${bookTitle}">
+      return `<button class="citation-pill" data-ref-idx="${idx}" data-book="${encodeURIComponent(bookTitle)}" data-page="${pageNum}" title="Inspect ${bookTitle}, Page ${pageNum}">
         <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
         ${badgeText}
       </button>`;
     });
-
-    return html;
   }
 
   /**
-   * Renders the Verified Textbook References accordion at bottom of message
+   * Renders the Verified Textbook References collapsible accordion
    */
   renderReferencesCard(citations) {
     if (!citations || citations.length === 0) return "";
@@ -162,13 +208,18 @@ export class MedGeminiUI {
       `;
     }).join("");
 
+    const summarySources = citations.map(c => `${c.subject} p. ${c.page_number}`).join(", ");
+
     return `
       <div class="references-card">
-        <div class="references-header">
-          <span>📚 Verified Textbook Evidence Sources (${citations.length} Books Grounded)</span>
-          <span style="font-size: 0.72rem; color: var(--med-blue);">Click any source to view full page</span>
+        <div class="references-header toggle-refs-btn" title="Click to view verified curriculum page excerpts">
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <span>📚 <strong>${citations.length} Grounded MBBS ${citations.length === 1 ? 'Source' : 'Sources'}</strong></span>
+            <span class="refs-summary-badge">${summarySources}</span>
+          </div>
+          <span class="refs-toggle-arrow">▾ View Sources</span>
         </div>
-        <div class="references-list">
+        <div class="references-list" style="display: none;">
           ${itemsHtml}
         </div>
       </div>

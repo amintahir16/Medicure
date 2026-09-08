@@ -17,23 +17,34 @@ from backend.config import (
 )
 from backend.engine.retriever import MBBSHybridRetriever
 
-MEDICAL_SYSTEM_PROMPT = """You are MedGemini MBBS, an elite, clinical-grade AI medical professor and consultation companion for MBBS medical students across their 5-year curriculum (Anatomy, Physiology, Biochemistry, Pathology, Pharmacology, Microbiology, Forensic, Community Medicine, Internal Medicine, Surgery, Pediatrics, OBGYN).
+MEDICAL_SYSTEM_PROMPT = """You are MedGemini MBBS, an elite clinical AI medical tutor strictly grounded in the official 5-year MBBS curriculum textbooks.
 
 YOUR PRIME DIRECTIVE:
-You must provide authoritative, comprehensive, scientifically rigorous medical explanations strictly grounded in the provided textbook evidence excerpts.
+Deliver clean, concise, high-yield, and to-the-point clinical answers. Be direct, authoritative, and structured. Avoid fluff, unnecessary disclaimers, walls of uninterrupted text, and conversational filler.
 
-CITATION RULES:
-1. Every major factual statement, mechanism, anatomical relation, pharmacological dosage/receptor target, or clinical guideline MUST have an inline citation.
-2. Format citations exactly as: [Ref X: Book Title | Chapter | Topic | Page Y] or [Ref X].
-3. At the end of your response, provide an explicit "### Verified Textbook References" section listing every referenced book, chapter, topic, and page number with the relevant quote.
-4. If a question is asked outside the available MBBS books, answer with standard clinical medicine principles while clearly denoting standard curriculum knowledge.
+FORMATTING & WRITING RULES:
+1. **Direct Answer First**:
+   - Start immediately with a 1-2 sentence core clinical summary answering the specific question.
+   - Never use conversational preamble (e.g., "Certainly!", "In medical practice", "Here is an overview").
 
-STRUCTURE OF ANSWERS:
-- **Direct Clinical Answer / Executive Summary**: Clear, high-yield overview.
-- **Detailed Mechanisms / Anatomical / Pharmacological Depth**: Deep clinical dive with physiological pathways, anatomical boundaries, or drug mechanisms.
-- **Clinical Pearl / Board Exam High-Yield Point**: Practical mnemonic or USMLE/NEET-PG/PLAB high-yield insight.
-- **Summary Matrix / Comparison Table**: When comparing diseases, drugs, or lesions.
-- **Verified References**: Exact Book Name, Chapter, Topic, and Page Number.
+2. **Clean Bullet Points Under Clear Headings**:
+   - Structure responses into concise sections using `### [Main Topic]` and `#### [Subtopic]`.
+   - Use crisp bullet points with bold lead keywords: `- **Key Concept**: Clinical explanation`.
+   - Keep bullet points to 1-2 lines. Never dump dense paragraphs.
+
+3. **Tables for Comparisons, Scoring & Staging**:
+   - When presenting diagnostic criteria, scoring systems (e.g. Alvarado, Glasgow Coma Scale, CURB-65), lab values, or drug comparisons, format them in a clean Markdown table.
+
+4. **Clean, Discrete Citations**:
+   - Cite using short tags only: `[Ref 1]`, `[Ref 2]` at the end of key statements or bullet points.
+   - Do NOT write long bracketed strings like `[Ref 1: Book Name | Chapter | ...]`.
+   - Do NOT scatter citations excessively on every word.
+
+5. **No Bibliography at Bottom**:
+   - Do NOT output a "### Verified References" or text bibliography at the bottom (the application UI automatically renders verified reference cards).
+
+6. **High-Yield Clinical Pearl**:
+   - Conclude with a single callout: `> 💡 **Clinical Pearl**: [High-yield USMLE/NEET-PG point or clinical trap]`.
 """
 
 class MBBSGenerator:
@@ -199,11 +210,13 @@ class MBBSGenerator:
             if active_provider == "groq" and active_key:
                 try:
                     broad_prompt = (
-                        f"The medical student or physician asked: '{query}'. "
-                        "While this specific topic was not directly matched in the currently indexed local textbooks, "
-                        "provide a comprehensive, authoritative, medical-school-level clinical explanation using standard clinical medicine principles. "
-                        "Structure your response clearly with clinical pathophysiological principles, diagnostic criteria, and management. "
-                        "Note briefly at the end that they can upload relevant textbook PDFs via the MBBS Book Library to index exact page citations."
+                        f"The medical student or physician asked: '{query}'.\n"
+                        "Provide a direct, high-yield, to-the-point clinical answer strictly following these rules:\n"
+                        "1. **Direct Answer First**: 1-2 sentence core summary answering the question immediately.\n"
+                        "2. **Structured Sections with Bullet Points**: Use clean headings (### and ####) with crisp, bold-led bullet points (- **Concept**: explanation).\n"
+                        "3. **Tables for Staging / Criteria**: If presenting diagnostic criteria, scoring systems, or comparisons, use a clean Markdown table.\n"
+                        "4. **Clinical Pearl**: Conclude with a single blockquote: '> 💡 **Clinical Pearl**: ...'.\n"
+                        "Do NOT include conversational filler, disclaimers, walls of text, or a references list."
                     )
                     answer_text, model_used = await self._call_groq(broad_prompt, active_key, model_name or GROQ_MODEL)
                     return {
@@ -330,32 +343,38 @@ class MBBSGenerator:
     def _build_prompt(self, query: str, context: str, study_mode: str, history: Optional[List[Dict[str, Any]]] = None) -> str:
         mode_instruction = ""
         if study_mode == "case_vignette":
-            mode_instruction = "Present this as a Clinical Case Scenario with Patient Presentation, History, Differential Diagnosis, Diagnostic Workup, and Definitive Management."
+            mode_instruction = "STRUCTURE: Clinical Case Vignette (Presentation, High-Yield Physical Findings, Diagnostic Workup, Definitive Management)."
         elif study_mode == "viva_quiz":
-            mode_instruction = "Format this as a Medical School Viva / Exam Oral Examination with Examiner Question, Model Answer, Key Clinical Traps, and Grading Criteria."
+            mode_instruction = "STRUCTURE: MBBS Oral Exam Card (Examiner Question, High-Yield Model Answer, Key Clinical Traps, Exam Pearl)."
+        else:
+            mode_instruction = "STRUCTURE: Direct, high-yield clinical consultation. Direct answer first, followed by clear, bulleted clinical points."
 
         history_block = ""
         if history:
             turns = []
-            for msg in history[-4:]:
+            for msg in history[-3:]:
                 role = "Student" if msg.get("role") == "user" else "MedGemini AI"
-                clean_c = msg.get("content", "")[:350].replace("\n", " ")
+                clean_c = msg.get("content", "")[:250].replace("\n", " ")
                 turns.append(f"{role}: {clean_c}")
             if turns:
-                history_block = "PRIOR CONSULTATION DIALOGUE:\n" + "\n".join(turns) + "\n\n"
+                history_block = "PRIOR CONSULTATION CONTEXT:\n" + "\n".join(turns) + "\n\n"
 
-        return f"""TEXTBOOK EVIDENCE EXCERPTS FROM 5-YEAR MBBS CURRICULUM:
+        return f"""TEXTBOOK EVIDENCE EXCERPTS:
 {context}
 
-{history_block}CURRENT STUDENT INQUIRY:
+{history_block}CLINICAL INQUIRY:
 {query}
 
 {mode_instruction}
 
-INSTRUCTIONS:
-1. Answer the student conversationally, rigorously, and comprehensively using the provided textbook evidence.
-2. In every paragraph, embed inline citations: [Ref X: Book Name | Chapter | Topic | Page Y] where the fact appears.
-3. Conclude with a clear list of textbook references with Book Title, Chapter, Topic, and Page Number.
+STRICT INSTRUCTIONS:
+1. Answer directly and crisply. Address the inquiry immediately in the first sentence.
+2. Structure with clean subheadings (####) and concise bullet points (- **Key**: Description).
+3. Do NOT produce long paragraphs or walls of text. Keep bullet points to 1-2 lines.
+4. If presenting scoring criteria, staging, or comparisons, use a clean Markdown table.
+5. Cite using short tags only: [Ref 1], [Ref 2] at the end of key statements.
+6. Do NOT output a text references list at the bottom.
+7. Conclude with a single '> 💡 **Clinical Pearl**: ...' blockquote.
 """
 
     async def _call_gemini(self, prompt: str, api_key: str, model: str) -> str:
@@ -444,7 +463,7 @@ INSTRUCTIONS:
                         {"role": "system", "content": MEDICAL_SYSTEM_PROMPT},
                         {"role": "user", "content": prompt}
                     ],
-                    "temperature": 0.2,
+                    "temperature": 0.1,
                     "max_tokens": 2048
                 }
                 try:
@@ -570,6 +589,77 @@ INSTRUCTIONS:
 
         return paras, pearl_text
 
+    def _format_clinical_bullets(self, text: str, max_bullets: int = 4) -> str:
+        """Transforms narrative medical textbook sentences into clean, readable clinical bullet points."""
+        text = " ".join(text.split()).strip()
+        if not text:
+            return ""
+
+        # If text has a colon introducing a list of items, criteria, or signs
+        colon_split = re.split(r':\s*', text, maxsplit=1)
+        if len(colon_split) == 2 and any(kw in colon_split[0].lower() for kw in [
+            'signs', 'etiology', 'triad', 'pathogens', 'regimens', 'score', 
+            'features', 'criteria', 'indications', 'findings', 'causes'
+        ]):
+            intro, items_str = colon_split
+            items = re.split(r';\s*|,\s*(?=[A-Z][a-z]+|\b(?:In|At|For|With|Score|Empiric|Adjunctive)\b)', items_str)
+            if len(items) >= 2:
+                bullet_lines = [f"- **{intro.strip()}**:"]
+                for item in items[:max_bullets]:
+                    item_clean = item.strip().rstrip('.')
+                    if item_clean:
+                        bullet_lines.append(f"  • {item_clean}")
+                return "\n".join(bullet_lines)
+
+    def _split_medical_sentences(self, text: str) -> List[str]:
+        """Splits medical text into distinct sentences while preserving species and drug abbreviations."""
+        protected = re.sub(r'\b([A-Z])\.\s*', r'\1<DOT>', text)
+        protected = re.sub(r'\b(e\.g|i\.e|vs|approx|etc|tab|inj|cap)\.\s*', r'\1<DOT>', protected, flags=re.IGNORECASE)
+        splits = re.split(r'[.!?]\s+(?=[A-Z0-9])', protected)
+        return [s.replace('<DOT>', '. ').strip() for s in splits if s.strip()]
+
+    def _format_clinical_bullets(self, text: str, max_bullets: int = 4) -> str:
+        """Transforms narrative medical textbook sentences into clean, readable clinical bullet points."""
+        text = " ".join(text.split()).strip()
+        if not text:
+            return ""
+
+        # If text has a colon introducing a list of items, criteria, or signs
+        colon_split = re.split(r':\s*', text, maxsplit=1)
+        if len(colon_split) == 2 and any(kw in colon_split[0].lower() for kw in [
+            'signs', 'etiology', 'triad', 'pathogens', 'regimens', 'score', 
+            'features', 'criteria', 'indications', 'findings', 'causes'
+        ]):
+            intro, items_str = colon_split
+            items = re.split(r';\s*|,\s*(?=[A-Z][a-z]+|\b(?:In|At|For|With|Score|Empiric|Adjunctive)\b)', items_str)
+            if len(items) >= 2:
+                bullet_lines = [f"- **{intro.strip()}**:"]
+                for item in items[:max_bullets]:
+                    item_clean = item.strip().rstrip('.')
+                    if item_clean:
+                        bullet_lines.append(f"  • {item_clean}")
+                return "\n".join(bullet_lines)
+
+        # Split into distinct sentences using protected abbreviation splitter
+        sentences = self._split_medical_sentences(text)
+        lines = []
+        for s in sentences:
+            s_clean = s.strip()
+            if not s_clean or len(s_clean) < 15:
+                continue
+            # Try to extract leading bold term if sentence is structured like "Term is..." or "Term (details)..."
+            match = re.match(r'^([A-Za-z0-9\s\/\-\'\(\)]+?)(?:\s+is\s+|\s+are\s+|:\s+|\s+comprises\s+|\s+presents\s+with\s+)(.*)$', s_clean, re.IGNORECASE)
+            if match and len(match.group(1).split()) <= 4 and not match.group(1).lower().startswith(('it', 'this', 'there', 'they', 'continued')):
+                label = match.group(1).strip()
+                rest = match.group(2).strip()
+                lines.append(f"- **{label}**: {rest}")
+            else:
+                lines.append(f"- {s_clean}")
+            if len(lines) >= max_bullets:
+                break
+
+        return "\n".join(lines) if lines else text
+
     def _generate_offline_grounded_response(
         self, 
         query: str, 
@@ -583,7 +673,6 @@ INSTRUCTIONS:
         """
         primary = evidence[0]
         secondary = evidence[1] if len(evidence) > 1 else None
-        tertiary = evidence[2] if len(evidence) > 2 else None
 
         primary_paras, primary_pearl = self._extract_page_components(
             primary["content"], topic=primary["topic"], chapter=primary["chapter"]
@@ -591,99 +680,114 @@ INSTRUCTIONS:
 
         response_parts = []
 
-        # 1. Authoritative Clinical Header
-        if study_mode == "case_vignette":
-            response_parts.append(f"### 🩺 Clinical Vignette & Case Discussion: {primary['topic']}")
-        elif study_mode == "viva_quiz":
-            response_parts.append(f"### 🎓 MBBS Board Examination: {primary['topic']}")
-        else:
-            response_parts.append(f"### 🩺 Clinical Consultation: {primary['topic']}")
+        # 1. Clean Topic Header
+        clean_topic = primary['topic'].split(':')[0].strip()
+        response_parts.append(f"### {clean_topic}")
 
-        response_parts.append(
-            f"*Primary Textbook Grounding: **{primary['book_title']}** ({primary['subject']} • {primary['mbbs_year']}) — Chapter: {primary['chapter']} • **Page {primary['page_number']}** of {primary['total_pages']}*\n"
-        )
+        # 2. Check for Table
+        table_md = ""
+        has_table = False
+        if primary.get("table_json"):
+            try:
+                t_obj = json.loads(primary["table_json"])
+                table_data = t_obj.get("data", [])
+                if table_data and len(table_data) >= 2:
+                    headers = table_data[0]
+                    rows = table_data[1:]
+                    t_lines = [
+                        "| " + " | ".join(headers) + " |",
+                        "| " + " | ".join([":---"] * len(headers)) + " |"
+                    ]
+                    for row in rows:
+                        cells = [str(c).replace("\n", " ").replace("|", "\\|") for c in row]
+                        while len(cells) < len(headers):
+                            cells.append("")
+                        cells = cells[:len(headers)]
+                        cells[0] = f"**{cells[0]}**"
+                        t_lines.append("| " + " | ".join(cells) + " |")
+                    table_md = "\n".join(t_lines)
+                    has_table = True
+            except Exception:
+                pass
 
-        # Citations
-        cit_1 = f"[Ref 1: {primary['book_title']} | {primary['chapter']} | {primary['topic']} | Page {primary['page_number']}]"
-
-        # 2. Primary Substantive Explanation (Section 1: Pathophysiology / Mechanism)
+        # 3. Direct High-Yield Summary (1-2 sentence core definition)
         if primary_paras:
             p0 = primary_paras[0].rstrip('.')
-            response_parts.append(f"#### 1. Core Pathophysiological Mechanisms & Clinical Presentation\n{p0}. {cit_1}")
-            
-            # Section 2: Clinical Details / Staging / Workup
+            sents = self._split_medical_sentences(p0)
+            definition = " ".join(sents[:1]) if sents else p0
+            response_parts.append(f"{definition}. [Ref 1]")
+
+            # Etiology / Mechanisms (remainder of p0 if substantial)
+            if len(sents) > 1:
+                remainder_lines = []
+                for s in sents[1:]:
+                    s_clean = s.rstrip('.')
+                    if len(s_clean) > 15:
+                        remainder_lines.append(self._format_clinical_bullets(s_clean, max_bullets=2))
+                if remainder_lines:
+                    response_parts.append(f"\n#### Core Pathophysiology & Etiology\n" + "\n".join(remainder_lines))
+
+            # Clinical Features & Diagnostic Workup (p1)
             if len(primary_paras) > 1:
                 p1 = primary_paras[1].rstrip('.')
-                response_parts.append(f"\n#### 2. Clinical Evaluation, Staging & Diagnostic Workup\n{p1}. {cit_1}")
-            
-            # Formatted Markdown Table if present
-            if primary.get("table_json"):
-                try:
-                    t_obj = json.loads(primary["table_json"])
-                    table_data = t_obj.get("data", [])
-                    if table_data and len(table_data) >= 2:
-                        headers = table_data[0]
-                        rows = table_data[1:]
-                        t_lines = [
-                            "| " + " | ".join(headers) + " |",
-                            "| " + " | ".join([":---"] * len(headers)) + " |"
-                        ]
-                        for row in rows:
-                            cells = [str(c).replace("\n", " ").replace("|", "\\|") for c in row]
-                            while len(cells) < len(headers):
-                                cells.append("")
-                            cells = cells[:len(headers)]
-                            cells[0] = f"**{cells[0]}**"
-                            t_lines.append("| " + " | ".join(cells) + " |")
-                        table_md = "\n".join(t_lines)
-                        response_parts.append(f"\n#### 📊 High-Yield Clinical Diagnostic & Management Matrix\n{table_md}\n*(Grounded in {primary['book_title']} • Page {primary['page_number']})*")
-                except Exception:
-                    pass
+                bullets_p1 = self._format_clinical_bullets(p1, max_bullets=4)
+                response_parts.append(f"\n#### Clinical Features & Diagnostic Workup\n{bullets_p1} [Ref 1]")
 
+            # Formatted Markdown Table if present
+            if has_table:
+                response_parts.append(f"\n#### Diagnostic & Clinical Matrix\n{table_md}")
+
+            # Management & Guidelines (p2, skip if redundant with table)
             if len(primary_paras) > 2:
                 p2 = primary_paras[2].rstrip('.')
-                response_parts.append(f"\n#### 3. Evidence-Based Therapeutic Protocols & Management Guidelines\n{p2}. {cit_1}")
+                is_duplicate = (has_table and "alvarado" in p2.lower() and "score" in p2.lower() and "points" in table_md.lower())
+                if not is_duplicate:
+                    bullets_p2 = self._format_clinical_bullets(p2, max_bullets=4)
+                    response_parts.append(f"\n#### Management & Clinical Guidelines\n{bullets_p2} [Ref 1]")
         else:
-            clean_raw = " ".join(primary["content"].split())[:450].rstrip('.')
-            response_parts.append(f"#### 1. Core Clinical Principles\n{clean_raw}. {cit_1}")
+            clean_raw = " ".join(primary["content"].split())[:350].rstrip('.')
+            response_parts.append(f"{clean_raw}. [Ref 1]")
 
-        # 3. Correlative Multi-Disciplinary Insights (Tripathi Pharmacology, Robbins Pathology, Guyton Physiology)
-        if secondary:
-            sec_paras, _ = self._extract_page_components(
-                secondary["content"], topic=secondary["topic"], chapter=secondary["chapter"]
-            )
-            cit_2 = f"[Ref 2: {secondary['book_title']} | {secondary['chapter']} | {secondary['topic']} | Page {secondary['page_number']}]"
-            
-            if sec_paras:
-                if secondary["subject"] != primary["subject"]:
-                    sec_title = f"🔬 Multidisciplinary Correlative Insights: {secondary['subject']} ({secondary['mbbs_year']})"
-                else:
-                    sec_title = f"📋 Integrated Clinical Context: {secondary['topic']}"
-                response_parts.append(f"\n#### {sec_title}\n{sec_paras[0].rstrip('.')}. {cit_2}")
+        # 4. Strict Multidisciplinary Clinical Correlation (MUST share specific medical entity)
+        if secondary and secondary["subject"] != primary["subject"]:
+            stop_words = {
+                "acute", "chronic", "management", "scoring", "score", "principles", 
+                "clinical", "pathogenesis", "criteria", "study", "general", "overview", 
+                "signs", "symptoms", "examination", "syndrome", "presentation", "regimen", 
+                "therapy", "treatment", "disease", "disorder", "infection", "diagnosis", "points"
+            }
+            primary_stems = {
+                w[:5].lower() for w in re.findall(r'\b[a-zA-Z]{5,}\b', primary["topic"] + " " + query)
+                if w.lower() not in stop_words
+            }
+            sec_stems = {
+                w[:5].lower() for w in re.findall(r'\b[a-zA-Z]{5,}\b', secondary["topic"])
+                if w.lower() not in stop_words
+            }
+            if primary_stems.intersection(sec_stems):
+                sec_paras, _ = self._extract_page_components(
+                    secondary["content"], topic=secondary["topic"], chapter=secondary["chapter"]
+                )
+                if sec_paras:
+                    sec_bullets = self._format_clinical_bullets(sec_paras[0], max_bullets=2)
+                    response_parts.append(f"\n#### Correlative {secondary['subject']} Insights\n{sec_bullets} [Ref 2]")
 
-        if tertiary and tertiary["subject"] != primary["subject"]:
-            tert_paras, _ = self._extract_page_components(
-                tertiary["content"], topic=tertiary["topic"], chapter=tertiary["chapter"]
-            )
-            cit_3 = f"[Ref 3: {tertiary['book_title']} | {tertiary['chapter']} | {tertiary['topic']} | Page {tertiary['page_number']}]"
-            if tert_paras:
-                tert_title = f"🔬 Multidisciplinary Correlative Insights: {tertiary['subject']} ({tertiary['mbbs_year']})"
-                response_parts.append(f"\n#### {tert_title}\n{tert_paras[0].rstrip('.')}. {cit_3}")
-
-        # 4. High-Yield MBBS Clinical Pearl (clean callout)
-        pearl_to_use = primary_pearl
-        pearl_cit = cit_1
-        if not pearl_to_use and secondary:
+        # 5. High-Yield Clinical Pearl
+        raw_pearl = primary_pearl
+        pearl_ref = "[Ref 1]"
+        if not raw_pearl and secondary:
             _, sec_pearl = self._extract_page_components(secondary["content"], secondary["topic"], secondary["chapter"])
             if sec_pearl:
-                pearl_to_use = sec_pearl
-                pearl_cit = f"[Ref 2: {secondary['book_title']} | {secondary['chapter']} | {secondary['topic']} | Page {secondary['page_number']}]"
+                raw_pearl = sec_pearl
+                pearl_ref = "[Ref 2]"
 
-        if pearl_to_use:
-            response_parts.append(f"\n> 💡 **High-Yield Clinical Pearl**: {pearl_to_use} {pearl_cit}")
+        if raw_pearl:
+            clean_pearl = re.sub(r'^(?:Clinical\s+Pearl|Pearl|Remember)[:\s\-\–]+', '', raw_pearl, flags=re.IGNORECASE).strip()
+            clean_pearl = re.sub(r'\s*\|\s*.*$', '', clean_pearl).strip()
+            response_parts.append(f"\n> 💡 **Clinical Pearl**: {clean_pearl} {pearl_ref}")
         else:
             response_parts.append(
-                f"\n> 💡 **High-Yield Clinical Pearl**: Always correlate anatomical landmarks and physiological reserve when managing patient presentations related to {primary['topic']}. {cit_1}"
+                f"\n> 💡 **Clinical Pearl**: Always correlate anatomical landmarks, clinical criteria, and physiological reserve during management of {clean_topic}. [Ref 1]"
             )
 
         return "\n".join(response_parts)
@@ -691,29 +795,30 @@ INSTRUCTIONS:
     def _extract_citations(self, answer_text: str, evidence: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Parses inline citations and correlates them with exact evidence metadata."""
         found_refs = set()
-        # Match [Ref X] or [Ref X: ...]
-        matches = re.findall(r'\[Ref\s*(\d+)(?::\s*([^\]]+))?\]', answer_text)
+        # Match [Ref X] or [Ref X: ...] or Ref [X]
+        matches = re.findall(r'(?:\[Ref\s*(\d+)|Ref\s*\[(\d+)\])', answer_text, re.IGNORECASE)
         for m in matches:
+            val = m[0] or m[1]
             try:
-                found_refs.add(int(m[0]))
+                found_refs.add(int(val))
             except ValueError:
                 pass
 
         citations = []
         for ev in evidence:
-            # If explicitly cited or if top-ranked
-            is_cited = ev["ref_index"] in found_refs or ev["ref_index"] <= 2
-            citations.append({
-                "ref_index": ev["ref_index"],
-                "is_cited": is_cited,
-                "book_title": ev["book_title"],
-                "subject": ev["subject"],
-                "mbbs_year": ev["mbbs_year"],
-                "chapter": ev["chapter"],
-                "topic": ev["topic"],
-                "page_number": ev["page_number"],
-                "total_pages": ev["total_pages"],
-                "excerpt": ev["excerpt"],
-                "citation_badge": f"[Ref {ev['ref_index']}: {ev['book_title']} | Ch. {ev['chapter'].split(':')[0]} | p. {ev['page_number']}]"
-            })
+            is_cited = ev["ref_index"] in found_refs or ev["ref_index"] == 1
+            if is_cited:
+                citations.append({
+                    "ref_index": ev["ref_index"],
+                    "is_cited": True,
+                    "book_title": ev["book_title"],
+                    "subject": ev["subject"],
+                    "mbbs_year": ev["mbbs_year"],
+                    "chapter": ev["chapter"],
+                    "topic": ev["topic"],
+                    "page_number": ev["page_number"],
+                    "total_pages": ev["total_pages"],
+                    "excerpt": ev["excerpt"],
+                    "citation_badge": f"[Ref {ev['ref_index']}: {ev['book_title']} | Ch. {ev['chapter'].split(':')[0]} | p. {ev['page_number']}]"
+                })
         return citations

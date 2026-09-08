@@ -194,6 +194,21 @@ class MedGeminiApp {
         return;
       }
 
+      const refsToggle = e.target.closest(".toggle-refs-btn");
+      if (refsToggle) {
+        const card = refsToggle.closest(".references-card");
+        const list = card ? card.querySelector(".references-list") : null;
+        const arrow = refsToggle.querySelector(".refs-toggle-arrow");
+        if (list) {
+          const isHidden = list.style.display === "none";
+          list.style.display = isHidden ? "flex" : "none";
+          if (arrow) {
+            arrow.innerHTML = isHidden ? "▴ Hide Sources" : "▾ View Sources";
+          }
+        }
+        return;
+      }
+
       const copyBtn = e.target.closest(".copy-msg-btn");
       if (copyBtn) {
         const textToCopy = copyBtn.dataset.rawText || "";
@@ -529,13 +544,22 @@ class MedGeminiApp {
       return;
     }
 
+    const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1);
     const dropzoneText = this.dropzone.querySelector("div");
     const originalHtml = dropzoneText.innerHTML;
-    dropzoneText.innerHTML = `<strong>Uploading and parsing ${file.name}...</strong>`;
+    dropzoneText.innerHTML = `
+      <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+        <div class="typing-indicator" style="justify-content:center;">
+          <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+        </div>
+        <strong>Uploading & indexing ${file.name} (${fileSizeMB} MB)...</strong>
+        <span style="font-size:0.75rem; color:var(--text-muted);">Extracting chapters, topics, and physical pages for curriculum grounding...</span>
+      </div>
+    `;
 
     try {
       const res = await this.api.uploadBook(file);
-      alert(`Success! Indexed '${file.name}' with ${res.indexed_chunks} sections.`);
+      alert(`Success! Indexed '${file.name}' with ${res.indexed_chunks} pages/sections.`);
       await this.openLibraryModal();
       await this.loadInitialData();
     } catch (e) {

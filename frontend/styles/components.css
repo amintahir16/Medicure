@@ -316,15 +316,40 @@
 }
 
 .references-header {
-  padding: 10px 14px;
+  padding: 8px 14px;
   background-color: var(--bg-tertiary);
   display: flex;
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
   font-size: 0.82rem;
-  font-weight: 600;
   color: var(--text-secondary);
+  transition: background-color var(--transition-fast);
+  user-select: none;
+}
+
+.references-header:hover {
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+.refs-summary-badge {
+  font-size: 0.72rem;
+  background: rgba(99, 102, 241, 0.12);
+  color: #a5b4fc;
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  font-family: var(--font-mono);
+}
+
+.refs-toggle-arrow {
+  font-size: 0.75rem;
+  color: var(--med-blue);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .references-list {
@@ -332,6 +357,8 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  border-top: 1px solid var(--border-subtle);
+  animation: fadeIn 0.2s ease;
 }
 
 .reference-item {

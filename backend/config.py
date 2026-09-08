@@ -40,8 +40,14 @@ SUBJECT_YEAR_MAP = {
     "Microbiology": "MBBS 2nd Year",
     "Forensic Medicine": "MBBS 3rd Year",
     "Community Medicine": "MBBS 3rd Year",
+    "Ophthalmology": "MBBS 3rd Year",
+    "Otorhinolaryngology (ENT)": "MBBS 3rd Year",
     "Internal Medicine": "MBBS 3rd to Final Year",
     "General Surgery": "MBBS 4th and Final Year",
     "Pediatrics": "MBBS 4th and Final Year",
-    "Obstetrics and Gynecology": "MBBS 4th and Final Year"
+    "Obstetrics and Gynecology": "MBBS 4th and Final Year",
+    "Orthopedics": "MBBS Final Year",
+    "Dermatology": "MBBS Final Year",
+    "Psychiatry": "MBBS Final Year"
 }
+

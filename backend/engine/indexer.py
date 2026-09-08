@@ -269,36 +269,50 @@ class MBBSIndexer:
             if row:
                 return dict(row)
 
-            # 2. Case-insensitive substring/keyword match
-            for kw in ["robbins", "guyton", "tripathi", "ghai", "anatomy", "surgery", "internal medicine", "medicine", "pathology", "physiology", "pharmacology", "pediatrics"]:
-                if kw in clean_title.lower():
-                    cursor.execute("""
-                        SELECT * FROM medical_records
-                        WHERE LOWER(book_title) LIKE ? AND (page_number = ? OR physical_page = ?)
-                        LIMIT 1
-                    """, (f"%{kw}%", page_number, page_number))
-                    row = cursor.fetchone()
-                    if row:
-                        return dict(row)
-                    
-                    # Fallback to page 1 of matched textbook
-                    cursor.execute("""
-                        SELECT * FROM medical_records
-                        WHERE LOWER(book_title) LIKE ?
-                        ORDER BY page_number ASC
-                        LIMIT 1
-                    """, (f"%{kw}%",))
-                    row = cursor.fetchone()
-                    if row:
-                        return dict(row)
+            # 2. Case-insensitive exact title match
+            cursor.execute("""
+                SELECT * FROM medical_records
+                WHERE LOWER(book_title) = LOWER(?) AND (page_number = ? OR physical_page = ?)
+                LIMIT 1
+            """, (clean_title, page_number, page_number))
+            row = cursor.fetchone()
+            if row:
+                return dict(row)
 
-            # 3. Fallback to any book partially matching title
+            # 3. Dynamic keyword match using title words (author name, distinctive terms)
+            stopwords = {"the", "and", "of", "in", "for", "with", "principles", "textbook", "essentials", "clinical", "reference", "page", "basis"}
+            title_words = [w.lower() for w in re.findall(r'\b[a-zA-Z]{3,}\b', clean_title) if w.lower() not in stopwords]
+
+            # Try to match both keyword and page
+            for kw in title_words:
+                cursor.execute("""
+                    SELECT * FROM medical_records
+                    WHERE LOWER(book_title) LIKE ? AND (page_number = ? OR physical_page = ?)
+                    LIMIT 1
+                """, (f"%{kw}%", page_number, page_number))
+                row = cursor.fetchone()
+                if row:
+                    return dict(row)
+
+            # Try to match keyword with closest page
+            for kw in title_words:
+                cursor.execute("""
+                    SELECT * FROM medical_records
+                    WHERE LOWER(book_title) LIKE ?
+                    ORDER BY ABS(page_number - ?) ASC
+                    LIMIT 1
+                """, (f"%{kw}%", page_number))
+                row = cursor.fetchone()
+                if row:
+                    return dict(row)
+
+            # 4. Fallback to any book partially matching title
             cursor.execute("""
                 SELECT * FROM medical_records
                 WHERE LOWER(book_title) LIKE ?
                 ORDER BY page_number ASC
                 LIMIT 1
-            """, (f"%{clean_title[:12].lower()}%",))
+            """, (f"%{clean_title[:10].lower()}%",))
             row = cursor.fetchone()
             if row:
                 return dict(row)
