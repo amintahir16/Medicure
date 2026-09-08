@@ -308,7 +308,7 @@ class MedicureApp {
 
   updateModelStatusBadge(health = null) {
     if (!this.modelPillText || !this.modelStatusDot) return;
-    const bookCount = (health && health.indexed_books_count) || 6;
+    const bookCount = (health && health.indexed_books_count !== undefined) ? health.indexed_books_count : 1;
     if (this.headerBookCount) {
       this.headerBookCount.textContent = bookCount;
     }
@@ -322,7 +322,8 @@ class MedicureApp {
       this.modelPillText.textContent = hasKey ? "Groq Cloud AI (Llama 3.3 70B)" : "Groq Cloud AI (Key Required)";
       this.modelStatusDot.style.backgroundColor = "#8b5cf6";
     } else {
-      this.modelPillText.textContent = `Medicure Grounded Engine (${bookCount} Books)`;
+      const bookLabel = bookCount === 1 ? "1 Book" : `${bookCount} Books`;
+      this.modelPillText.textContent = `Medicure Grounded Engine (${bookLabel})`;
       this.modelStatusDot.style.backgroundColor = "#10b981";
     }
   }
