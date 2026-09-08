@@ -1,5 +1,5 @@
 """
-Entry Point for MedGemini MBBS AI Chatbot
+Entry Point for Medicure MBBS AI Chatbot
 Ensures database and books are seeded, then launches Uvicorn server.
 """
 
@@ -17,7 +17,7 @@ from backend.engine.indexer import MBBSIndexer
 
 def main():
     print("=" * 65)
-    print("  MEDGEMINI MBBS CLINICAL CONSULTATION CHATBOT")
+    print("  MEDICURE MBBS CLINICAL CONSULTATION CHATBOT")
     print("  5-Year Curriculum Knowledge Base with Exact Grounding Citations")
     print("=" * 65)
 
@@ -31,7 +31,7 @@ def main():
     for b in summary:
         print(f"    - {b['book_title']} ({b['subject']} • {b['total_pages']} pages)")
 
-    print("\n[*] Starting MedGemini server at: http://127.0.0.1:8000")
+    print("\n[*] Starting Medicure server at: http://127.0.0.1:8000")
     print("=" * 65)
 
     uvicorn.run("backend.app:app", host="127.0.0.1", port=8000, reload=True)

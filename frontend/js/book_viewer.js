@@ -4,7 +4,7 @@
  * view highlighted clinical quotes, and navigate adjacent pages.
  */
 
-export class MedGeminiBookViewer {
+export class MedicureBookViewer {
   constructor(api, drawerElement) {
     this.api = api;
     this.drawer = drawerElement;

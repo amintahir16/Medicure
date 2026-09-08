@@ -2,7 +2,7 @@
  * UI Rendering & Markdown Engine with Interactive Citation Badges
  */
 
-export class MedGeminiUI {
+export class MedicureUI {
   constructor() {
     this.speechSynth = window.speechSynthesis;
   }

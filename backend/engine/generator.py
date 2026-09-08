@@ -17,7 +17,7 @@ from backend.config import (
 )
 from backend.engine.retriever import MBBSHybridRetriever
 
-MEDICAL_SYSTEM_PROMPT = """You are MedGemini MBBS, an elite clinical AI medical tutor strictly grounded in the official 5-year MBBS curriculum textbooks.
+MEDICAL_SYSTEM_PROMPT = """You are Medicure MBBS, an elite clinical AI medical tutor strictly grounded in the official 5-year MBBS curriculum textbooks.
 
 YOUR PRIME DIRECTIVE:
 Deliver clean, concise, high-yield, and to-the-point clinical answers. Be direct, authoritative, and structured. Avoid fluff, unnecessary disclaimers, walls of uninterrupted text, and conversational filler.
@@ -86,7 +86,7 @@ class MBBSGenerator:
                     "1. Click **⚙️ Model & API Settings** in the bottom left of the sidebar.\n"
                     "2. Paste your free Groq API key (starts with `gsk_...` from [console.groq.com](https://console.groq.com/keys)).\n"
                     "3. Click **Save & Apply Settings**.\n\n"
-                    "*(Or select **MedGemini Built-in Grounded Engine** for 100% offline access with zero API keys required).* "
+                    "*(Or select **Medicure Built-in Grounded Engine** for 100% offline access with zero API keys required).* "
                 ),
                 "evidence": [],
                 "citations": [],
@@ -104,7 +104,7 @@ class MBBSGenerator:
                     "1. Click **⚙️ Model & API Settings** in the bottom left of the sidebar.\n"
                     "2. Paste your free Google AI Studio key (starts with `AIzaSy...`).\n"
                     "3. Click **Save & Apply Settings**.\n\n"
-                    "*(Or select **MedGemini Built-in Grounded Engine** for 100% offline access with zero API keys required).* "
+                    "*(Or select **Medicure Built-in Grounded Engine** for 100% offline access with zero API keys required).* "
                 ),
                 "evidence": [],
                 "citations": [],
@@ -124,7 +124,7 @@ class MBBSGenerator:
                 try:
                     greeting_prompt = (
                         f"The medical student or physician just said: '{query}'. "
-                        "Respond warmly, conversationally, and authoritatively as MedGemini, the clinical AI medical tutor powered by Groq Cloud AI (Llama 3.3 70B). "
+                        "Respond warmly, conversationally, and authoritatively as Medicure, the clinical AI medical tutor powered by Groq Cloud AI (Llama 3.3 70B). "
                         "Introduce yourself as an AI tutor strictly grounded across 5 full years of MBBS curriculum textbooks "
                         "(Anatomy, Physiology, Pathology, Pharmacology, Internal Medicine, General Surgery, Pediatrics). "
                         "Invite them to ask any clinical question, case vignette, or exam scenario with exact textbook page citations."
@@ -152,7 +152,7 @@ class MBBSGenerator:
                 try:
                     greeting_prompt = (
                         f"The medical student or physician just said: '{query}'. "
-                        "Respond warmly, conversationally, and authoritatively as MedGemini, the clinical AI medical tutor powered by Google Gemini 2.0 Flash. "
+                        "Respond warmly, conversationally, and authoritatively as Medicure, the clinical AI medical tutor powered by Google Gemini 2.0 Flash. "
                         "Introduce yourself as an AI tutor strictly grounded across 5 full years of MBBS curriculum textbooks. "
                         "Invite them to ask any clinical question, case vignette, or exam scenario with exact textbook page citations."
                     )
@@ -181,7 +181,7 @@ class MBBSGenerator:
                     "answer": self._get_offline_greeting(),
                     "evidence": [],
                     "citations": [],
-                    "provider_used": "MedGemini Built-in Grounded Engine (Offline)",
+                    "provider_used": "Medicure Built-in Grounded Engine (Offline)",
                     "total_references": 0
                 }
 
@@ -268,7 +268,7 @@ class MBBSGenerator:
                     "answer": self._get_no_evidence_message(query),
                     "evidence": [],
                     "citations": [],
-                    "provider_used": "MedGemini Grounded Engine (Offline)",
+                    "provider_used": "Medicure Grounded Engine (Offline)",
                     "total_references": 0
                 }
 
@@ -297,7 +297,7 @@ class MBBSGenerator:
                 provider_used = "Offline Grounded Engine (Groq fallback)"
         else:
             answer_text = self._generate_offline_grounded_response(query, evidence, study_mode)
-            provider_used = "MedGemini Built-in Grounded Engine (Offline)"
+            provider_used = "Medicure Built-in Grounded Engine (Offline)"
 
         # Step 4.5: Normalize citation brackets (convert 【Ref 1】, ［Ref 1］, (Ref 1) to [Ref 1])
         answer_text = re.sub(r'[【［〔(]\s*Ref\.?\s*(\d+)\s*[】］〕)]', r'[Ref \1]', answer_text, flags=re.IGNORECASE)
@@ -317,19 +317,17 @@ class MBBSGenerator:
 
     def _get_offline_greeting(self) -> str:
         return (
-            "### 🩺 Hello, Doctor! Welcome to MedGemini (Offline Mode)\n\n"
-            "I am your clinical medical AI companion, strictly grounded across **7 verified MBBS curriculum textbooks**:\n"
-            "- **1st Year**: Human Anatomy & Neuroanatomy, Medical Physiology (Guyton Principles)\n"
-            "- **2nd Year**: Pathology (Robbins Principles), Medical Pharmacology (Tripathi Principles)\n"
-            "- **3rd to 5th Year**: Internal Medicine & Clinical Examination, General Surgery (ATLS & Critical Care), Pediatrics (Ghai Principles)\n\n"
+            "### 🩺 Hello, Doctor! Welcome to Medicure (Offline Mode)\n\n"
+            "I am your clinical medical AI companion, strictly grounded in standard **MBBS curriculum textbooks** "
+            "(Anatomy, Physiology, Pathology, Pharmacology, Internal Medicine, Surgery, and Pediatrics).\n\n"
             "⚡ **Zero API Keys Required**: The built-in grounded offline engine is active right now! Every medical answer includes exact citations with **Book Title, Chapter, Topic, and Page Number**.\n\n"
             "*(Tip: To enable conversational LLM mode powered by Groq Cloud AI or Gemini, select it and enter your free API key in **⚙️ Model & API Settings** in the sidebar).* \n\n"
             "#### 💡 Sample Clinical Questions to Try:\n"
-            "1. *'Explain the phases of the cardiac cycle and Wiggers diagram'* (Guyton Physiology, p. 2-3)\n"
-            "2. *'Tell me about acute bacterial, viral and TB meningitis workup and CSF findings'* (Internal Medicine, p. 6)\n"
-            "3. *'Why do ACE inhibitors cause persistent dry cough compared to ARBs?'* (Pharmacology, p. 2)\n"
-            "4. *'Describe Erb palsy vs Klumpke palsy nerve root injuries and waiter tip deformity'* (Anatomy, p. 2)\n"
-            "5. *'What is the Alvarado score and McBurney point for acute appendicitis?'* (General Surgery, p. 4)\n\n"
+            "1. *'Classification of bones according to shape in general anatomy'* (BD Chaurasia, p. 44)\n"
+            "2. *'What are the characteristics of diaphysis, metaphysis, and epiphysis?'* (BD Chaurasia, p. 45)\n"
+            "3. *'Describe the blood supply and nerve supply of long bones'* (BD Chaurasia, p. 50)\n"
+            "4. *'Explain the functional classification of joints and synovial joint structures'* (BD Chaurasia, p. 62)\n"
+            "5. *'Define anatomical planes and cardinal axes of human body movement'* (BD Chaurasia, p. 12)\n\n"
             "What medical topic would you like to explore?"
         )
 
@@ -357,7 +355,7 @@ class MBBSGenerator:
         if history:
             turns = []
             for msg in history[-3:]:
-                role = "Student" if msg.get("role") == "user" else "MedGemini AI"
+                role = "Student" if msg.get("role") == "user" else "Medicure AI"
                 clean_c = msg.get("content", "")[:250].replace("\n", " ")
                 turns.append(f"{role}: {clean_c}")
             if turns:

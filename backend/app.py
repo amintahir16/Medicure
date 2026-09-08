@@ -1,5 +1,5 @@
 """
-FastAPI Server for MedGemini MBBS AI Chatbot
+FastAPI Server for Medicure MBBS AI Chatbot
 Serves API endpoints for grounded retrieval, multi-model generation,
 PDF book library management, and static frontend.
 """
@@ -22,7 +22,7 @@ from backend.engine.memory import MBBSMemoryManager
 from backend.seed.sample_cases import SAMPLE_PROMPTS, STUDY_VIVA_BANK
 
 app = FastAPI(
-    title="MedGemini MBBS AI Chatbot",
+    title="Medicure MBBS AI Chatbot",
     description="Ground-truth medical consultation companion for MBBS students with exact book, chapter, topic and page referencing.",
     version="2.0.0"
 )
@@ -57,7 +57,7 @@ async def startup_event():
     new_books = indexer.sync_books_dir()
     if new_books:
         print(f"Auto-indexed new textbooks: {list(new_books.keys())}")
-    print(f"MedGemini Server ready. {len(indexer.get_books_summary())} MBBS books indexed.")
+    print(f"Medicure Server ready. {len(indexer.get_books_summary())} MBBS books indexed.")
 
 
 # --- Pydantic Request Models ---
@@ -85,7 +85,7 @@ async def health_check():
     total_pages = sum(b.get("total_pages", 0) for b in books)
     return {
         "status": "healthy",
-        "system": "MedGemini MBBS AI 2.0 (Hybrid Dense-Sparse RAG)",
+        "system": "Medicure MBBS AI 2.0 (Hybrid Dense-Sparse RAG)",
         "indexed_books_count": len(books),
         "total_curriculum_pages": total_pages,
         "embedding_engine": "FastEmbed (BAAI/bge-small-en-v1.5)",
@@ -95,7 +95,7 @@ async def health_check():
         "active_models": {
             "gemini": GEMINI_MODEL,
             "groq": GROQ_MODEL,
-            "offline": "MedGemini Built-in Grounded Engine"
+            "offline": "Medicure Built-in Grounded Engine"
         }
     }
 
@@ -141,7 +141,7 @@ async def chat_endpoint(req: ChatRequest):
             "answer": result.get("answer", "No response generated."),
             "citations": result.get("citations", []),
             "evidence": result.get("evidence", []),
-            "provider_used": result.get("provider_used", "MedGemini"),
+            "provider_used": result.get("provider_used", "Medicure"),
             "total_references": result.get("total_references", len(result.get("citations", [])))
         }
     except Exception as e:

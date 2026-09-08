@@ -1,5 +1,5 @@
 """
-Local Embedding Engine for MedGemini MBBS
+Local Embedding Engine for Medicure MBBS
 Uses FastEmbed (ONNX Runtime) with BAAI/bge-small-en-v1.5 (384 dimensions).
 Completely local, offline-capable, and fast on standard CPU.
 """

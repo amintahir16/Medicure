@@ -1,5 +1,5 @@
 """
-Automated Test Suite for MedGemini MBBS AI Engine
+Automated Test Suite for Medicure MBBS AI Engine
 Validates:
 1. Local FastEmbed embedding engine and 384-dimensional dense vectors.
 2. Multi-year textbook indexing integrity with dense vectors in SQLite.

@@ -1,8 +1,8 @@
 /**
- * API Client for MedGemini Backend
+ * API Client for Medicure Backend
  */
 
-export class MedGeminiAPI {
+export class MedicureAPI {
   constructor(baseUrl = "") {
     this.baseUrl = baseUrl;
   }
@@ -21,7 +21,7 @@ export class MedGeminiAPI {
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({ detail: "Chat request failed" }));
-      throw new Error(err.detail || "Error connecting to MedGemini");
+      throw new Error(err.detail || "Error connecting to Medicure");
     }
     return res.json();
   }

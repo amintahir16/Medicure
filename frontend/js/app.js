@@ -1,26 +1,37 @@
 /**
- * MedGemini Application Main Controller
+ * Medicure Application Main Controller
  */
 
-import { MedGeminiAPI } from "./api.js";
-import { MedGeminiUI } from "./ui.js";
-import { MedGeminiBookViewer } from "./book_viewer.js";
+import { MedicureAPI } from "./api.js";
+import { MedicureUI } from "./ui.js";
+import { MedicureBookViewer } from "./book_viewer.js";
 
-class MedGeminiApp {
+// Storage helper for seamless continuity between Medicure and legacy keys
+const getStorage = (key) => localStorage.getItem(`medicure_${key}`) || localStorage.getItem(`medgemini_${key}`);
+const setStorage = (key, val) => {
+  localStorage.setItem(`medicure_${key}`, val);
+  localStorage.setItem(`medgemini_${key}`, val);
+};
+const removeStorage = (key) => {
+  localStorage.removeItem(`medicure_${key}`);
+  localStorage.removeItem(`medgemini_${key}`);
+};
+
+class MedicureApp {
   constructor() {
-    this.api = new MedGeminiAPI();
-    this.ui = new MedGeminiUI();
-    this.sessionId = localStorage.getItem("medgemini_session_id") || null;
+    this.api = new MedicureAPI();
+    this.ui = new MedicureUI();
+    this.sessionId = getStorage("session_id") || null;
     this.currentYearFilter = "all";
     this.currentSubjectFilter = "all";
     this.currentStudyMode = "standard";
 
     // User settings
     this.settings = {
-      provider: localStorage.getItem("medgemini_provider") || "offline",
-      geminiKey: localStorage.getItem("medgemini_gemini_key") || "",
-      groqKey: localStorage.getItem("medgemini_groq_key") || "",
-      theme: localStorage.getItem("medgemini_theme") || "dark"
+      provider: getStorage("provider") || "offline",
+      geminiKey: getStorage("gemini_key") || "",
+      groqKey: getStorage("groq_key") || "",
+      theme: getStorage("theme") || "dark"
     };
 
     this.init();
@@ -78,7 +89,7 @@ class MedGeminiApp {
 
   initBookViewer() {
     const drawerEl = document.getElementById("inspector-drawer");
-    this.bookViewer = new MedGeminiBookViewer(this.api, drawerEl);
+    this.bookViewer = new MedicureBookViewer(this.api, drawerEl);
   }
 
   attachEventListeners() {
@@ -272,7 +283,7 @@ class MedGeminiApp {
 
   applyTheme(theme) {
     this.settings.theme = theme;
-    localStorage.setItem("medgemini_theme", theme);
+    setStorage("theme", theme);
     document.documentElement.setAttribute("data-theme", theme);
     if (this.themeToggleBtn) {
       this.themeToggleBtn.innerHTML = theme === "dark" ? "☀️ Light" : "🌙 Dark";
@@ -311,7 +322,7 @@ class MedGeminiApp {
       this.modelPillText.textContent = hasKey ? "Groq Cloud AI (Llama 3.3 70B)" : "Groq Cloud AI (Key Required)";
       this.modelStatusDot.style.backgroundColor = "#8b5cf6";
     } else {
-      this.modelPillText.textContent = `MedGemini Grounded Engine (${bookCount} Books)`;
+      this.modelPillText.textContent = `Medicure Grounded Engine (${bookCount} Books)`;
       this.modelStatusDot.style.backgroundColor = "#10b981";
     }
   }
@@ -395,7 +406,7 @@ class MedGeminiApp {
 
   async loadSession(sessionId) {
     this.sessionId = sessionId;
-    localStorage.setItem("medgemini_session_id", sessionId);
+    setStorage("session_id", sessionId);
 
     this.historyList?.querySelectorAll(".history-item").forEach(item => {
       item.classList.toggle("active", item.dataset.sessionId === sessionId);
@@ -432,7 +443,7 @@ class MedGeminiApp {
 
   startNewChat() {
     this.sessionId = null;
-    localStorage.removeItem("medgemini_session_id");
+    removeStorage("session_id");
     const existingRows = this.chatScrollArea.querySelectorAll(".message-row");
     existingRows.forEach(r => r.remove());
     this.welcomeHero.style.display = "flex";
@@ -476,7 +487,7 @@ class MedGeminiApp {
 
       // Always update active session id & refresh recent consultations list
       this.sessionId = resp.session_id;
-      localStorage.setItem("medgemini_session_id", this.sessionId);
+      setStorage("session_id", this.sessionId);
       await this.loadHistorySessions();
 
       // Remove loading indicator & display AI message
@@ -596,9 +607,9 @@ class MedGeminiApp {
     this.settings.geminiKey = this.geminiKeyInput.value.trim();
     this.settings.groqKey = this.groqKeyInput.value.trim();
 
-    localStorage.setItem("medgemini_provider", this.settings.provider);
-    localStorage.setItem("medgemini_gemini_key", this.settings.geminiKey);
-    localStorage.setItem("medgemini_groq_key", this.settings.groqKey);
+    setStorage("provider", this.settings.provider);
+    setStorage("gemini_key", this.settings.geminiKey);
+    setStorage("groq_key", this.settings.groqKey);
 
     this.settingsModal.classList.remove("active");
     this.updateModelStatusBadge();
@@ -681,5 +692,6 @@ class MedGeminiApp {
 
 // Instantiate on DOM load
 document.addEventListener("DOMContentLoaded", () => {
-  window.medGemini = new MedGeminiApp();
+  window.medicure = new MedicureApp();
+  window.medGemini = window.medicure;
 });
