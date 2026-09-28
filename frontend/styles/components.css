@@ -286,6 +286,25 @@
   border-bottom: 1px solid rgba(16, 185, 129, 0.15);
 }
 
+.ai-message-body blockquote.emergency-alert {
+  border-left: 3px solid var(--med-rose);
+  background: linear-gradient(135deg, rgba(244, 63, 94, 0.14) 0%, rgba(225, 29, 72, 0.06) 100%);
+  border-top: 1px solid rgba(244, 63, 94, 0.25);
+  border-right: 1px solid rgba(244, 63, 94, 0.25);
+  border-bottom: 1px solid rgba(244, 63, 94, 0.25);
+  color: #ffe4e6;
+  font-weight: 500;
+}
+
+[data-theme="light"] .ai-message-body blockquote.emergency-alert {
+  background: #fff1f2;
+  border-left-color: #e11d48;
+  border-top-color: #fecdd3;
+  border-right-color: #fecdd3;
+  border-bottom-color: #fecdd3;
+  color: #9f1239;
+}
+
 /* Clinical Markdown Tables */
 .ai-message-body table {
   width: 100%;

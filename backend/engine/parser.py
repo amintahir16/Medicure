@@ -43,7 +43,13 @@ class PDFBookParser:
         for page_idx, page in enumerate(reader.pages):
             page_num = page_idx + 1  # 1-indexed physical page
             try:
-                raw_text = page.extract_text() or ""
+                # Use layout extraction mode to preserve multi-column textbook formatting
+                try:
+                    raw_text = page.extract_text(extraction_mode="layout") or ""
+                except Exception:
+                    raw_text = page.extract_text() or ""
+                if not raw_text.strip():
+                    raw_text = page.extract_text() or ""
             except Exception as e:
                 print(f"Warning: error reading page {page_num} in {pdf_path.name}: {e}")
                 continue
@@ -89,12 +95,14 @@ class PDFBookParser:
                     "handbook of" in line_lower or "textbook of" in line_lower or "principles of" in line_lower):
                     continue
 
-                # Must be a valid medical heading: not a sentence, not a page number, not a table column
+                # Must be a valid medical heading: not a sentence, not a page number, not a table column, not a figure caption
                 if (len(line) >= 4 and len(line) < 110
                     and not line_lower.startswith("page ")
                     and not line_lower.startswith("chapter ")
                     and not line_lower.startswith("clinical pearl")
+                    and not line_lower.startswith(("fig.", "figure", "fig ", "table", "diagram", "chart", "photo"))
                     and not line.endswith('.')
+                    and len(line.split()) >= 2
                     and not any(line_lower == tw for tw in table_words)
                     and not any(line_lower.startswith(tw + " ") for tw in ["table", "shock class"])
                     and any(c.isupper() for c in line)):

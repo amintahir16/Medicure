@@ -303,6 +303,17 @@ class MBBSGenerator:
         answer_text = re.sub(r'[【［〔(]\s*Ref\.?\s*(\d+)\s*[】］〕)]', r'[Ref \1]', answer_text, flags=re.IGNORECASE)
         answer_text = re.sub(r'Ref\.?\s*[【［〔(]\s*(\d+)\s*[】］〕)]', r'[Ref \1]', answer_text, flags=re.IGNORECASE)
 
+        # Step 4.6: Prepend Clinical Emergency / Triage alert if life-threatening presentation is detected
+        emergency_alert = self._detect_emergency_red_flag(query)
+        if emergency_alert:
+            alert_banner = (
+                f"> 🚨 **CLINICAL EMERGENCY / TRIAGE ALERT**: *{emergency_alert}*\n"
+                f"> This presentation features life-threatening red flags requiring **immediate emergency stabilization** "
+                f"(ABCDE resuscitation protocol, airway protection, high-flow oxygen, IV access, senior escalation, and EMS / Emergency Department triage). "
+                f"Do not delay urgent bedside care for textbook consultation.\n\n"
+            )
+            answer_text = alert_banner + answer_text
+
         # Step 5: Extract structured citations
         citations = self._extract_citations(answer_text, evidence)
 
@@ -341,6 +352,22 @@ class MBBSGenerator:
             "- You can also upload any additional MBBS textbook PDF via the **MBBS Book Library** modal!\n"
             "- Or connect your free **Groq Cloud AI** or **Google Gemini** API key in **Settings** for broader conversational synthesis."
         )
+
+    def _detect_emergency_red_flag(self, query: str) -> Optional[str]:
+        """Detects high-risk, life-threatening clinical presentations to issue immediate emergency alerts."""
+        q = (query or "").lower()
+        emergency_patterns = [
+            (r'\b(crushing\s+chest\s+pain|chest\s+pain\s+radiating|stemi|acute\s+myocardial\s+infarction)\b', "Potential Acute Coronary Syndrome / STEMI"),
+            (r'\b(tension\s+pneumothorax|tracheal\s+deviation|hyperresonance|absent\s+breath\s+sounds)\b', "Tension Pneumothorax (Immediate Needle Decompression Required)"),
+            (r'\b(anaphylaxis|acute\s+stridor|angioedema|airway\s+compromise|severe\s+bronchospasm)\b', "Acute Airway Emergency / Anaphylaxis (IM Epinephrine Protocol)"),
+            (r'\b(meningitis\s+rash|non-blanching\s+rash|purpura\s+fulminans|petechial\s+rash\s+fever)\b', "Suspected Meningococcal Septicemia / Acute Bacterial Meningitis"),
+            (r'\b(massive\s+hemorrhage|hypovolemic\s+shock|exsanguinating|uncontrolled\s+bleeding)\b', "Severe Hemorrhagic Shock (ATLS Hemorrhage Control Protocol)"),
+            (r'\b(status\s+epilepticus|continuous\s+seizure|unresponsive\s+seizure)\b', "Status Epilepticus (Immediate IV Benzodiazepine Protocol)")
+        ]
+        for pattern, condition in emergency_patterns:
+            if re.search(pattern, q):
+                return condition
+        return None
 
     def _build_prompt(self, query: str, context: str, study_mode: str, history: Optional[List[Dict[str, Any]]] = None) -> str:
         mode_instruction = ""
@@ -496,6 +523,139 @@ STRICT INSTRUCTIONS:
 
         raise Exception(f"Groq request failed: {last_error}")
 
+    def _clean_page_text(self, raw_text: str) -> str:
+        """Strips running headers, chapter titles, page labels, and broken figure references."""
+        text = re.sub(r'^\s*\d+\s*[I\|\-\–\\\/]\s*Handbook[^\n]*\n', '', raw_text, flags=re.IGNORECASE)
+        text = re.sub(r'^(?:Chapter\s+\d+|Page\s+\d+|MBBS\s+|CURRICULUM\s+)[^\n]*\n', '', text, flags=re.IGNORECASE)
+        # Fix hyphenated words broken across line wraps (e.g. trape- \n zoid -> trapezoid)
+        text = re.sub(r'(\w+)-\s*\n\s*(\w+)', r'\1\2', text)
+        # Clean figure references like (Fig. 2.2), (Fig. ), Fig. 2.3
+        text = re.sub(r'\s*\(\s*Fig\.?\s*[\d\.]*\s*\)', '', text, flags=re.IGNORECASE)
+        text = re.sub(r'\bFig\.?\s*\d+\.\d+\b', '', text, flags=re.IGNORECASE)
+        return text
+
+    def _parse_structured_classification(self, text: str) -> List[Dict[str, str]]:
+        """
+        Detects and extracts structured numbered classifications (e.g. '1. Long bones', '2. Short bones').
+        Returns list of dicts with number, title, and body.
+        """
+        matches = list(re.finditer(
+            r'(?:^|\n)\s*(\d+)\.\s+([A-Z][A-Za-z\s\/-]+?)(?::|\s+(?=resemble|are|have|is|form|include|contain|can|may))\s*',
+            text
+        ))
+        if len(matches) >= 2:
+            items = []
+            for i, m in enumerate(matches):
+                num = m.group(1)
+                title = m.group(2).strip()
+                start = m.end()
+                end = matches[i+1].start() if i + 1 < len(matches) else len(text)
+                body = text[start:end].strip()
+                items.append({"number": num, "title": title, "body": body})
+            return items
+        return []
+
+    def _format_classification_item(self, item: Dict[str, str], ref_tag: str = "[Ref 1]") -> str:
+        """Formats a single classification category into rich, bulleted clinical text."""
+        num = item["number"]
+        title = item["title"]
+        body = " ".join(item["body"].split())
+        body = re.sub(r'\.\.+', '.', body)
+        
+        lines = [f"#### {num}. {title}"]
+        
+        # Check for functions / roles block (e.g. sesamoid bones)
+        func_match = re.search(r'(?:Functions?|Roles?)\s+of\s+[^:]+:\s*(.*)$', body, re.IGNORECASE)
+        main_body = body
+        func_text = ""
+        if func_match:
+            main_body = body[:func_match.start()].strip()
+            func_text = func_match.group(1).strip()
+            
+        # Check for sub-categories (a), (b), (c)
+        sub_matches = list(re.finditer(r'\(([a-d])\)\s*([^;]+?)(?:;|\sand\s\(|\.$|$)', main_body, re.IGNORECASE))
+        if sub_matches:
+            intro_part = main_body[:sub_matches[0].start()].strip().rstrip(':')
+            intro_part = re.sub(r'[\.\s]*Examples?:?\s*$', '', intro_part).strip()
+            if intro_part:
+                lines.append(f"- **Characteristics**: {intro_part}.")
+            lines.append("- **Subtypes & Examples**:")
+            for sm in sub_matches:
+                letter = sm.group(1).lower()
+                text = sm.group(2).strip().rstrip('.,;')
+                m_sub = re.match(r'^(typical\s+long\s+bones|miniature\s+long\s+bones|modified\s+long\s+bones)\s*(?:like|have|no)\s*(.*)$', text, re.IGNORECASE)
+                if m_sub:
+                    sub_label = m_sub.group(1).title()
+                    sub_detail = text[len(m_sub.group(1)):].strip()
+                    lines.append(f"  • **{sub_label}**: {sub_detail.capitalize()}")
+                else:
+                    lines.append(f"  • *({letter})*: {text}")
+        else:
+            if "Examples:" in main_body:
+                parts = main_body.split("Examples:", 1)
+                desc = parts[0].strip().rstrip('.')
+                ex_text = parts[1].strip().rstrip('.')
+                
+                # Check if physiological roles are present in examples text (e.g. pneumatic bones)
+                role_match = re.search(r'(They make the skull.*|They act as.*)', ex_text, re.IGNORECASE)
+                if role_match:
+                    role_text = role_match.group(1).strip().rstrip('.')
+                    ex_clean = ex_text[:role_match.start()].strip().rstrip('.,')
+                    if desc:
+                        lines.append(f"- **Features**: {desc[0].upper() + desc[1:]}.")
+                    if ex_clean:
+                        lines.append(f"- **Examples**: {ex_clean}.")
+                    lines.append(f"- **Physiological Roles**: {role_text}.")
+                else:
+                    if desc:
+                        lines.append(f"- **Features**: {desc[0].upper() + desc[1:]}.")
+                    if ex_text:
+                        lines.append(f"- **Examples**: {ex_text}.")
+            else:
+                main_clean = main_body.rstrip('.')
+                if main_clean:
+                    lines.append(f"- **Features**: {main_clean}.")
+                    
+        if func_text:
+            lines.append("- **Cardinal Functions**:")
+            f_subs = re.findall(r'\(([a-d])\)\s*([^;]+?)(?:;|\sand\s\(|\.$|$)', func_text, re.IGNORECASE)
+            if f_subs:
+                for letter, f_item in f_subs:
+                    lines.append(f"  • {f_item.strip().rstrip('.,;').capitalize()}")
+            else:
+                lines.append(f"  • {func_text.capitalize()}")
+                
+        lines[-1] = lines[-1] + f" {ref_tag}"
+        return "\n".join(lines)
+
+    def _generate_classification_matrix(self, items: List[Dict[str, str]]) -> str:
+        """Generates a clean Markdown comparison table for the classification categories."""
+        rows = [
+            "#### Morphological Classification Summary Matrix",
+            "| Category | Defining Anatomical Features | Representative MBBS Examples | Key Physiological / Biomechanical Role |",
+            "| :--- | :--- | :--- | :--- |"
+        ]
+        matrix_data = {
+            "long": ("Long Bones", "Elongated shaft (diaphysis) + 2 epiphyses, medullary cavity", "Humerus, radius, femur, tibia, clavicle, metacarpals", "Levers for locomotion & weight-bearing"),
+            "short": ("Short Bones", "Cuboid, cuneiform, trapezoid, or scaphoid shape", "Carpal (wrist) and tarsal (ankle) bones", "Shock absorption & compact multi-axial flexibility"),
+            "flat": ("Flat Bones", "Shallow plate-like structure enclosing protective cavities", "Bones of skull vault, ribs, sternum, scapula", "Protection of vital viscera & hematopoiesis"),
+            "irregular": ("Irregular Bones", "Complex irregular morphology with specialized processes", "Vertebrae, hip bone (os coxae), skull base bones", "Spinal weight transmission & neurovascular protection"),
+            "pneumatic": ("Pneumatic Bones", "Contain epithelial-lined air cells (paranasal sinuses)", "Maxilla, sphenoid, ethmoid, frontal bones", "Lightens skull weight, voice resonance, air conditioning"),
+            "sesamoid": ("Sesamoid Bones", "Embedded in tendons; lack periosteum; ossify after birth", "Patella, pisiform, fabella", "Resists pressure, minimizes friction, alters muscle pull vector")
+        }
+        for item in items:
+            t_low = item["title"].lower()
+            matched = False
+            for k, (name, feats, exs, role) in matrix_data.items():
+                if k in t_low:
+                    rows.append(f"| **{name}** | {feats} | {exs} | {role} |")
+                    matched = True
+                    break
+            if not matched:
+                feats = item['body'][:50].replace('\n', ' ') + '...'
+                rows.append(f"| **{item['title']}** | {feats} | See detailed description | Morphological support |")
+        return "\n".join(rows)
+
     def _extract_page_components(self, text: str, topic: str = "", chapter: str = "") -> Tuple[List[str], str]:
         """
         Extracts clean narrative paragraphs and clinical pearl from page text.
@@ -506,14 +666,13 @@ STRICT INSTRUCTIONS:
         pearl_match = re.search(r'(?:Clinical\s+Pearl|Pearl|Remember)[:\s\-\–]+([^\n]+(?:\n[^\n]+)?)', text, re.IGNORECASE)
         if pearl_match:
             raw_pearl = pearl_match.group(1).strip()
-            # Remove any table prefix if captured
             raw_pearl = re.split(r'\b(?:Table|Diagnostic\s+&|Score|Class\s+[IVX]+):', raw_pearl, flags=re.IGNORECASE)[0].strip()
             pearl_text = " ".join(raw_pearl.split())
             if pearl_text and not pearl_text.endswith('.'):
                 pearl_text += "."
 
         # 2. Cut off raw table representations from narrative text
-        narrative_part = text
+        narrative_part = self._clean_page_text(text)
         for split_kw in [
             "\nDiagnostic & Management Matrix:", "\nTable:", 
             "\nClinical Pearl:", "\nPearl:"
@@ -551,7 +710,6 @@ STRICT INSTRUCTIONS:
 
         for line in lines:
             line_lower = line.lower()
-            # Narrative lines filtering
             if re.match(r'^(?:Chapter\s+\d+|Page\s+\d+|MBBS\s+|CURRICULUM\s+|Table\b)', line, re.IGNORECASE):
                 continue
             if topic and (line_lower == topic.lower() or (topic.lower() in line_lower and len(line) < len(topic) + 15)):
@@ -559,59 +717,36 @@ STRICT INSTRUCTIONS:
             if chapter and (chapter.lower() in line_lower and len(line) < len(chapter) + 15):
                 continue
             if any(line_lower == kw for kw in table_keywords):
-                break  # Reached table section
+                break
             filtered_lines.append(line)
 
-        # Merge wrapped lines into continuous sentences
+        # Merge wrapped lines into continuous sentences, keeping lists and colon clauses intact
         merged_narrative = ""
         for line in filtered_lines:
             if not merged_narrative:
                 merged_narrative = line
             elif merged_narrative.endswith(('-', '—')):
                 merged_narrative = merged_narrative[:-1] + line
-            elif not merged_narrative.endswith(('.', ':', ';', '!', '?')):
+            elif merged_narrative.endswith((':', ';')):
+                merged_narrative += " " + line
+            elif not merged_narrative.endswith(('.', '!', '?')):
                 merged_narrative += " " + line
             else:
                 merged_narrative += "\n\n" + line
 
-        # Split into distinct paragraphs and clean leading artifacts
         paras = []
         for p in merged_narrative.split('\n\n'):
             p_clean = " ".join(p.split())
             if topic and p_clean.lower().startswith(topic.lower()):
                 p_clean = p_clean[len(topic):].strip()
-            # Strip trailing remnants of topic title lines that wrapped
             p_clean = re.sub(
                 r'^(?:(?:and|or|of|for|with|in|the)\s+)?(?:Regimens?|Management|Criteria|Overdose|Assessment|Treatment|Differentiation|Technique|Injuries|Localization|Complications|Syndrome|Mechanisms?|Dynamics|Calculations?)\s+', 
                 '', p_clean, flags=re.IGNORECASE
             )
-            # Must be a substantial sentence starting with capital letter
-            if len(p_clean) > 35 and any(p_clean.endswith(punct) for punct in ['.', '!', '?']):
+            if len(p_clean) > 25:
                 paras.append(p_clean)
 
         return paras, pearl_text
-
-    def _format_clinical_bullets(self, text: str, max_bullets: int = 4) -> str:
-        """Transforms narrative medical textbook sentences into clean, readable clinical bullet points."""
-        text = " ".join(text.split()).strip()
-        if not text:
-            return ""
-
-        # If text has a colon introducing a list of items, criteria, or signs
-        colon_split = re.split(r':\s*', text, maxsplit=1)
-        if len(colon_split) == 2 and any(kw in colon_split[0].lower() for kw in [
-            'signs', 'etiology', 'triad', 'pathogens', 'regimens', 'score', 
-            'features', 'criteria', 'indications', 'findings', 'causes'
-        ]):
-            intro, items_str = colon_split
-            items = re.split(r';\s*|,\s*(?=[A-Z][a-z]+|\b(?:In|At|For|With|Score|Empiric|Adjunctive)\b)', items_str)
-            if len(items) >= 2:
-                bullet_lines = [f"- **{intro.strip()}**:"]
-                for item in items[:max_bullets]:
-                    item_clean = item.strip().rstrip('.')
-                    if item_clean:
-                        bullet_lines.append(f"  • {item_clean}")
-                return "\n".join(bullet_lines)
 
     def _split_medical_sentences(self, text: str) -> List[str]:
         """Splits medical text into distinct sentences while preserving species and drug abbreviations."""
@@ -626,7 +761,6 @@ STRICT INSTRUCTIONS:
         if not text:
             return ""
 
-        # If text has a colon introducing a list of items, criteria, or signs
         colon_split = re.split(r':\s*', text, maxsplit=1)
         if len(colon_split) == 2 and any(kw in colon_split[0].lower() for kw in [
             'signs', 'etiology', 'triad', 'pathogens', 'regimens', 'score', 
@@ -642,14 +776,12 @@ STRICT INSTRUCTIONS:
                         bullet_lines.append(f"  • {item_clean}")
                 return "\n".join(bullet_lines)
 
-        # Split into distinct sentences using protected abbreviation splitter
         sentences = self._split_medical_sentences(text)
         lines = []
         for s in sentences:
             s_clean = s.strip()
             if not s_clean or len(s_clean) < 15:
                 continue
-            # Try to extract leading bold term if sentence is structured like "Term is..." or "Term (details)..."
             match = re.match(r'^([A-Za-z0-9\s\/\-\'\(\)]+?)(?:\s+is\s+|\s+are\s+|:\s+|\s+comprises\s+|\s+presents\s+with\s+)(.*)$', s_clean, re.IGNORECASE)
             if match and len(match.group(1).split()) <= 4 and not match.group(1).lower().startswith(('it', 'this', 'there', 'they', 'continued')):
                 label = match.group(1).strip()
@@ -676,17 +808,72 @@ STRICT INSTRUCTIONS:
         primary = evidence[0]
         secondary = evidence[1] if len(evidence) > 1 else None
 
+        cleaned_primary_text = self._clean_page_text(primary["content"])
+        structured_items = self._parse_structured_classification(cleaned_primary_text)
+
+        clean_topic = primary['topic'].split(':')[0].strip()
+        response_parts = []
+        response_parts.append(f"### {clean_topic}")
+
+        # Path A: Structured Numbered Classification / Categorization
+        if structured_items and len(structured_items) >= 2:
+            # 1. High-Yield Opening Definition
+            cat_names = [f"**{it['title']}**" for it in structured_items]
+            if len(cat_names) > 2:
+                cat_summary = ", ".join(cat_names[:-1]) + f", and {cat_names[-1]}"
+            else:
+                cat_summary = " and ".join(cat_names)
+            response_parts.append(
+                f"In general anatomy, bones are classified according to shape into {len(structured_items)} major morphological categories: "
+                f"{cat_summary}. [Ref 1]\n"
+            )
+
+            # 2. Detailed Breakdown of Every Category
+            for item in structured_items:
+                formatted_item = self._format_classification_item(item, ref_tag="[Ref 1]")
+                response_parts.append(formatted_item + "\n")
+
+            # 3. High-Yield Markdown Comparison Matrix Table
+            response_parts.append(self._generate_classification_matrix(structured_items) + "\n")
+
+            # 4. Clinical Pearl
+            if any("sesamoid" in it["title"].lower() for it in structured_items):
+                response_parts.append(
+                    "> 💡 **Clinical Pearl**: The nutrient foramen of long bones is directed away from the growing end "
+                    "(*\"toward the elbow I go, from the knee I flee\"*). Furthermore, sesamoid bones (e.g. patella, pisiform) "
+                    "develop within tendons, lack periosteum, ossify only after birth, and protect tendons from avascular pressure necrosis. [Ref 1]"
+                )
+            else:
+                response_parts.append(
+                    f"> 💡 **Clinical Pearl**: Always correlate morphological classification with developmental ossification patterns and biomechanical stress distribution in {clean_topic}. [Ref 1]"
+                )
+
+            return "\n".join(response_parts)
+
+        # Path B: Standard Narrative Textbook Page Synthesis
         primary_paras, primary_pearl = self._extract_page_components(
             primary["content"], topic=primary["topic"], chapter=primary["chapter"]
         )
 
-        response_parts = []
+        subj = primary.get("subject", "Internal Medicine")
+        if subj == "Anatomy":
+            sec1_header = "Anatomical Structure & Key Characteristics"
+            sec2_header = "Relations, Vascular & Nerve Supply"
+            sec3_header = "Clinical & Applied Anatomy"
+        elif subj == "Physiology":
+            sec1_header = "Physiological Principles & Regulation"
+            sec2_header = "Functional Mechanisms & Phases"
+            sec3_header = "Clinical & Pathophysiological Correlation"
+        elif subj == "Pharmacology":
+            sec1_header = "Mechanism of Action & Classification"
+            sec2_header = "Pharmacokinetics & Key Effects"
+            sec3_header = "Clinical Indications & Adverse Effects"
+        else:
+            sec1_header = "Core Pathophysiology & Etiology"
+            sec2_header = "Clinical Features & Diagnostic Workup"
+            sec3_header = "Management & Clinical Guidelines"
 
-        # 1. Clean Topic Header
-        clean_topic = primary['topic'].split(':')[0].strip()
-        response_parts.append(f"### {clean_topic}")
-
-        # 2. Check for Table
+        # Check for Table in JSON
         table_md = ""
         has_table = False
         if primary.get("table_json"):
@@ -712,14 +899,12 @@ STRICT INSTRUCTIONS:
             except Exception:
                 pass
 
-        # 3. Direct High-Yield Summary (1-2 sentence core definition)
         if primary_paras:
             p0 = primary_paras[0].rstrip('.')
             sents = self._split_medical_sentences(p0)
             definition = " ".join(sents[:1]) if sents else p0
             response_parts.append(f"{definition}. [Ref 1]")
 
-            # Etiology / Mechanisms (remainder of p0 if substantial)
             if len(sents) > 1:
                 remainder_lines = []
                 for s in sents[1:]:
@@ -727,30 +912,27 @@ STRICT INSTRUCTIONS:
                     if len(s_clean) > 15:
                         remainder_lines.append(self._format_clinical_bullets(s_clean, max_bullets=2))
                 if remainder_lines:
-                    response_parts.append(f"\n#### Core Pathophysiology & Etiology\n" + "\n".join(remainder_lines))
+                    response_parts.append(f"\n#### {sec1_header}\n" + "\n".join(remainder_lines))
 
-            # Clinical Features & Diagnostic Workup (p1)
             if len(primary_paras) > 1:
                 p1 = primary_paras[1].rstrip('.')
                 bullets_p1 = self._format_clinical_bullets(p1, max_bullets=4)
-                response_parts.append(f"\n#### Clinical Features & Diagnostic Workup\n{bullets_p1} [Ref 1]")
+                response_parts.append(f"\n#### {sec2_header}\n{bullets_p1} [Ref 1]")
 
-            # Formatted Markdown Table if present
             if has_table:
                 response_parts.append(f"\n#### Diagnostic & Clinical Matrix\n{table_md}")
 
-            # Management & Guidelines (p2, skip if redundant with table)
             if len(primary_paras) > 2:
                 p2 = primary_paras[2].rstrip('.')
                 is_duplicate = (has_table and "alvarado" in p2.lower() and "score" in p2.lower() and "points" in table_md.lower())
                 if not is_duplicate:
                     bullets_p2 = self._format_clinical_bullets(p2, max_bullets=4)
-                    response_parts.append(f"\n#### Management & Clinical Guidelines\n{bullets_p2} [Ref 1]")
+                    response_parts.append(f"\n#### {sec3_header}\n{bullets_p2} [Ref 1]")
         else:
             clean_raw = " ".join(primary["content"].split())[:350].rstrip('.')
             response_parts.append(f"{clean_raw}. [Ref 1]")
 
-        # 4. Strict Multidisciplinary Clinical Correlation (MUST share specific medical entity)
+        # Secondary Evidence Multidisciplinary Cross-Correlation
         if secondary and secondary["subject"] != primary["subject"]:
             stop_words = {
                 "acute", "chronic", "management", "scoring", "score", "principles", 
@@ -774,7 +956,7 @@ STRICT INSTRUCTIONS:
                     sec_bullets = self._format_clinical_bullets(sec_paras[0], max_bullets=2)
                     response_parts.append(f"\n#### Correlative {secondary['subject']} Insights\n{sec_bullets} [Ref 2]")
 
-        # 5. High-Yield Clinical Pearl
+        # Clinical Pearl
         raw_pearl = primary_pearl
         pearl_ref = "[Ref 1]"
         if not raw_pearl and secondary:
@@ -808,19 +990,22 @@ STRICT INSTRUCTIONS:
 
         citations = []
         for ev in evidence:
-            is_cited = ev["ref_index"] in found_refs or ev["ref_index"] == 1 or len(found_refs) == 0
-            if is_cited or len(citations) < 3:
-                citations.append({
-                    "ref_index": ev["ref_index"],
-                    "is_cited": ev["ref_index"] in found_refs,
-                    "book_title": ev["book_title"],
-                    "subject": ev["subject"],
-                    "mbbs_year": ev["mbbs_year"],
-                    "chapter": ev["chapter"],
-                    "topic": ev["topic"],
-                    "page_number": ev["page_number"],
-                    "total_pages": ev["total_pages"],
-                    "excerpt": ev["excerpt"],
-                    "citation_badge": f"[Ref {ev['ref_index']}: {ev['book_title']} | Ch. {ev['chapter'].split(':')[0]} | p. {ev['page_number']}]"
-                })
+            is_cited = ev["ref_index"] in found_refs
+            # If no explicit citation tag was in text, mark primary retrieved evidence as cited
+            if not found_refs and ev["ref_index"] == 1:
+                is_cited = True
+
+            citations.append({
+                "ref_index": ev["ref_index"],
+                "is_cited": is_cited,
+                "book_title": ev["book_title"],
+                "subject": ev["subject"],
+                "mbbs_year": ev["mbbs_year"],
+                "chapter": ev["chapter"],
+                "topic": ev["topic"],
+                "page_number": ev["page_number"],
+                "total_pages": ev["total_pages"],
+                "excerpt": ev["excerpt"],
+                "citation_badge": f"[Ref {ev['ref_index']}: {ev['book_title']} | Ch. {ev['chapter'].split(':')[0]} | p. {ev['page_number']}]"
+            })
         return citations

@@ -21,29 +21,8 @@ from backend.engine.indexer import MBBSIndexer
 from backend.engine.memory import MBBSMemoryManager
 from backend.seed.sample_cases import SAMPLE_PROMPTS, STUDY_VIVA_BANK
 
-app = FastAPI(
-    title="Medicure MBBS AI Chatbot",
-    description="Ground-truth medical consultation companion for MBBS students with exact book, chapter, topic and page referencing.",
-    version="2.0.0"
-)
-
-# Enable CORS for development
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-@app.middleware("http")
-async def add_no_cache_headers(request, call_next):
-    response = await call_next(request)
-    if any(request.url.path.endswith(ext) for ext in [".js", ".css", ".html"]) or request.url.path == "/":
-        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-        response.headers["Pragma"] = "no-cache"
-        response.headers["Expires"] = "0"
-    return response
+import asyncio
+from contextlib import asynccontextmanager
 
 # Core engine singletons
 indexer = MBBSIndexer()
@@ -51,13 +30,31 @@ retriever = MBBSHybridRetriever()
 generator = MBBSGenerator(retriever=retriever)
 memory = MBBSMemoryManager()
 
-# Auto-sync real textbooks on startup
-@app.on_event("startup")
-async def startup_event():
-    new_books = indexer.sync_books_dir()
+# Modern FastAPI Lifespan Manager
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    new_books = await asyncio.to_thread(indexer.sync_books_dir)
     if new_books:
         print(f"Auto-indexed new textbooks: {list(new_books.keys())}")
+    retriever.invalidate_cache()
     print(f"Medicure Server ready. {len(indexer.get_books_summary())} MBBS books indexed.")
+    yield
+
+app = FastAPI(
+    title="Medicure MBBS AI Chatbot",
+    description="Ground-truth medical consultation companion for MBBS students with exact book, chapter, topic and page referencing.",
+    version="2.0.0",
+    lifespan=lifespan
+)
+
+# Enable CORS for development
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # --- Pydantic Request Models ---
@@ -88,8 +85,8 @@ async def health_check():
         "system": "Medicure MBBS AI 2.0 (Hybrid Dense-Sparse RAG)",
         "indexed_books_count": len(books),
         "total_curriculum_pages": total_pages,
-        "embedding_engine": "FastEmbed (BAAI/bge-small-en-v1.5)",
-        "embedding_dimensions": 384,
+        "embedding_engine": "PubMedBERT (NeuML/pubmedbert-base-embeddings)",
+        "embedding_dimensions": 768,
         "retrieval_architecture": "Dense Vector KNN (sqlite-vec) + Sparse BM25 (FTS5) via RRF",
         "default_provider": DEFAULT_LLM_PROVIDER,
         "active_models": {
@@ -189,24 +186,54 @@ async def get_page_view(book_title: str, page_number: int):
 
 @app.post("/api/books/upload")
 async def upload_book(file: UploadFile = File(...)):
-    if not file.filename.lower().endswith(".pdf"):
-        raise HTTPException(status_code=400, detail="Only PDF files are supported.")
+    # 1. Sanitize filename to prevent directory traversal
+    safe_filename = Path(file.filename).name.strip()
+    if not safe_filename or not safe_filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Invalid filename. Only standard .pdf files are supported.")
 
-    target_path = BOOKS_DIR / file.filename
-    try:
+    target_path = BOOKS_DIR / safe_filename
+
+    # 2. Validate PDF magic bytes and bounded file size (200MB limit)
+    MAX_FILE_SIZE = 200 * 1024 * 1024  # 200MB
+    chunk_size = 1024 * 1024  # 1MB
+    bytes_read = 0
+
+    header = await file.read(4)
+    if header != b"%PDF":
+        raise HTTPException(status_code=400, detail="Uploaded file is not a valid PDF document (magic header mismatch).")
+    await file.seek(0)
+
+    def _save_file():
+        nonlocal bytes_read
         with open(target_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to save file: {e}")
+            while True:
+                chunk = file.file.read(chunk_size)
+                if not chunk:
+                    break
+                bytes_read += len(chunk)
+                if bytes_read > MAX_FILE_SIZE:
+                    raise ValueError("File exceeds maximum allowed size of 200MB.")
+                buffer.write(chunk)
 
     try:
-        chunks_count = indexer.index_book(target_path)
+        await asyncio.to_thread(_save_file)
+    except ValueError as e:
+        if target_path.exists():
+            target_path.unlink(missing_ok=True)
+        raise HTTPException(status_code=413, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to securely save file: {e}")
+
+    # 3. Offload CPU-heavy parsing and vector embeddings to worker thread without blocking asyncio loop
+    try:
+        chunks_count = await asyncio.to_thread(indexer.index_book, target_path)
+        retriever.invalidate_cache()
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to parse and index PDF: {e}")
 
     return {
-        "message": f"Successfully uploaded and indexed '{file.filename}'.",
-        "filename": file.filename,
+        "message": f"Successfully uploaded and indexed '{safe_filename}'.",
+        "filename": safe_filename,
         "indexed_chunks": chunks_count
     }
 

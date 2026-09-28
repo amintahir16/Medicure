@@ -31,7 +31,8 @@ export class MedicureUI {
     html = html.replace(/^## (.*$)/gim, '<h3>$1</h3>');
     html = html.replace(/^# (.*$)/gim, '<h2>$1</h2>');
 
-    // 3. Blockquotes / Clinical Pearls
+    // 3. Blockquotes / Clinical Pearls & Emergency Triage Alerts
+    html = html.replace(/^&gt;\s*🚨\s*(.*?)$/gim, '<blockquote class="emergency-alert">🚨 $1</blockquote>');
     html = html.replace(/^&gt;\s*💡\s*(.*?)$/gim, '<blockquote>💡 $1</blockquote>');
     html = html.replace(/^&gt;\s*(.*?)$/gim, '<blockquote>$1</blockquote>');
 

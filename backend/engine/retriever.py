@@ -20,9 +20,16 @@ class MBBSHybridRetriever:
         self.db_path = db_path
         self.indexer = MBBSIndexer(db_path=db_path)
         self.embedder = self.indexer.embedder
+        self._cached_matrix = None
+        self._cached_rec_ids = None
+
+    def invalidate_cache(self):
+        """Clears the in-memory fallback vector cache when new textbooks are indexed."""
+        self._cached_matrix = None
+        self._cached_rec_ids = None
 
     def _clean_fts_query(self, query: str) -> str:
-        """Cleans and formats natural language query into an FTS5 MATCH expression."""
+        """Cleans and formats natural language query into a sanitized FTS5 MATCH expression."""
         # Medical conversational fluff to exclude
         stop_words = {
             "what", "why", "how", "when", "where", "which", "who", "whom", 
@@ -68,13 +75,16 @@ class MBBSHybridRetriever:
         if not keywords:
             keywords = raw_words
 
-        # Build OR query with prefix matching on key terms, retaining medical acronyms
+        # Build OR query with prefix matching on key terms, retaining medical acronyms and sanitizing special chars
         fts_terms = []
         for k in keywords:
-            if len(k) >= 4:
-                fts_terms.append(f'"{k}"*')
+            clean_k = re.sub(r'[^a-zA-Z0-9_\-]', '', k).strip()
+            if not clean_k:
+                continue
+            if len(clean_k) >= 4:
+                fts_terms.append(f'"{clean_k}"*')
             else:
-                fts_terms.append(f'"{k}"')
+                fts_terms.append(f'"{clean_k}"')
 
         return " OR ".join(fts_terms)
 
@@ -90,33 +100,33 @@ class MBBSHybridRetriever:
             return []
 
         conn = self.indexer.get_connection()
-        cursor = conn.cursor()
-
-        where_clauses = []
-        params = [fts_query]
-
-        if subject_filter and subject_filter.lower() != "all":
-            where_clauses.append("r.subject = ?")
-            params.append(subject_filter)
-
-        if year_filter and year_filter.lower() not in ["all", "all years"]:
-            where_clauses.append("(r.mbbs_year LIKE ? OR ? LIKE '%' || r.mbbs_year || '%')")
-            params.extend([f"%{year_filter}%", year_filter])
-
-        filter_sql = (" AND " + " AND ".join(where_clauses)) if where_clauses else ""
-
-        sql = f"""
-            SELECT 
-                r.id,
-                bm25(medical_chunks_fts) as bm25_rank
-            FROM medical_chunks_fts f
-            JOIN medical_records r ON f.content_rowid = r.id
-            WHERE medical_chunks_fts MATCH ? {filter_sql}
-            ORDER BY bm25_rank ASC
-            LIMIT {limit}
-        """
-
         try:
+            cursor = conn.cursor()
+
+            where_clauses = []
+            params = [fts_query]
+
+            if subject_filter and subject_filter.lower() != "all":
+                where_clauses.append("r.subject = ?")
+                params.append(subject_filter)
+
+            if year_filter and year_filter.lower() not in ["all", "all years"]:
+                where_clauses.append("(r.mbbs_year LIKE ? OR ? LIKE '%' || r.mbbs_year || '%')")
+                params.extend([f"%{year_filter}%", year_filter])
+
+            filter_sql = (" AND " + " AND ".join(where_clauses)) if where_clauses else ""
+
+            sql = f"""
+                SELECT 
+                    r.id,
+                    bm25(medical_chunks_fts) as bm25_rank
+                FROM medical_chunks_fts f
+                JOIN medical_records r ON f.content_rowid = r.id
+                WHERE medical_chunks_fts MATCH ? {filter_sql}
+                ORDER BY bm25_rank ASC
+                LIMIT {limit}
+            """
+
             cursor.execute(sql, params)
             rows = cursor.fetchall()
             return [
@@ -129,13 +139,15 @@ class MBBSHybridRetriever:
             ]
         except sqlite3.OperationalError:
             return []
+        finally:
+            conn.close()
 
     def _search_dense_vectors(
         self, 
         query: str, 
         limit: int = 25
     ) -> List[Dict[str, Any]]:
-        """Stream 2: Neural dense vector semantic search using FastEmbed + sqlite-vec (or NumPy cosine fallback)."""
+        """Stream 2: Neural dense vector semantic search using FastEmbed + sqlite-vec (or cached NumPy cosine fallback)."""
         try:
             q_emb = self.embedder.embed_query(query)
             if q_emb is None or len(q_emb) == 0 or np.all(q_emb == 0):
@@ -145,53 +157,63 @@ class MBBSHybridRetriever:
             return []
 
         conn = self.indexer.get_connection()
-        cursor = conn.cursor()
-
-        # 1. Primary path: Native sqlite-vec KNN search
         try:
-            cursor.execute(f"""
-                SELECT record_id, distance
-                FROM medical_vectors
-                WHERE embedding MATCH ? AND k = {limit}
-            """, (q_emb,))
-            rows = cursor.fetchall()
-            if rows:
+            cursor = conn.cursor()
+
+            # 1. Primary path: Native sqlite-vec KNN search
+            try:
+                cursor.execute(f"""
+                    SELECT record_id, distance
+                    FROM medical_vectors
+                    WHERE embedding MATCH ? AND k = {limit}
+                """, (q_emb,))
+                rows = cursor.fetchall()
+                if rows:
+                    return [
+                        {
+                            "id": row["record_id"],
+                            "rank": idx,
+                            "dense_similarity": max(0.0, 1.0 - (float(row["distance"]) / 2.0))
+                        }
+                        for idx, row in enumerate(rows)
+                    ]
+            except Exception:
+                pass
+
+            # 2. Resilient fallback: In-memory cached NumPy vectorized cosine similarity
+            try:
+                if self._cached_matrix is None or self._cached_rec_ids is None:
+                    cursor.execute("SELECT id, embedding FROM medical_records WHERE embedding IS NOT NULL")
+                    rows = cursor.fetchall()
+                    if not rows:
+                        return []
+
+                    self._cached_rec_ids = [r["id"] for r in rows]
+                    self._cached_matrix = np.array(
+                        [self.embedder.deserialize_vector(r["embedding"]) for r in rows], 
+                        dtype=np.float32
+                    )
+
+                if self._cached_matrix is None or len(self._cached_matrix) == 0:
+                    return []
+
+                # Compute cosine similarities: dot product of normalized vectors
+                scores = np.dot(self._cached_matrix, q_emb)
+                top_indices = np.argsort(scores)[::-1][:limit]
+
                 return [
                     {
-                        "id": row["record_id"],
-                        "rank": idx,
-                        "dense_similarity": max(0.0, 1.0 - float(row["distance"]))
+                        "id": self._cached_rec_ids[idx],
+                        "rank": rank,
+                        "dense_similarity": float(scores[idx])
                     }
-                    for idx, row in enumerate(rows)
+                    for rank, idx in enumerate(top_indices)
                 ]
-        except Exception as e:
-            pass
-
-        # 2. Resilient fallback: NumPy vectorized cosine similarity
-        try:
-            cursor.execute("SELECT id, embedding FROM medical_records WHERE embedding IS NOT NULL")
-            rows = cursor.fetchall()
-            if not rows:
+            except Exception as e:
+                print(f"Warning: NumPy vector fallback encountered error: {e}")
                 return []
-
-            rec_ids = [r["id"] for r in rows]
-            matrix = np.array([self.embedder.deserialize_vector(r["embedding"]) for r in rows], dtype=np.float32)
-            
-            # Compute cosine similarities: dot product of normalized vectors
-            scores = np.dot(matrix, q_emb)
-            top_indices = np.argsort(scores)[::-1][:limit]
-
-            return [
-                {
-                    "id": rec_ids[idx],
-                    "rank": rank,
-                    "dense_similarity": float(scores[idx])
-                }
-                for rank, idx in enumerate(top_indices)
-            ]
-        except Exception as e:
-            print(f"Warning: NumPy vector fallback encountered error: {e}")
-            return []
+        finally:
+            conn.close()
 
     def search(
         self, 
@@ -263,28 +285,31 @@ class MBBSHybridRetriever:
 
         # 4. Fetch full candidate records from SQLite
         conn = self.indexer.get_connection()
-        cursor = conn.cursor()
+        try:
+            cursor = conn.cursor()
 
-        placeholders = ','.join('?' for _ in all_candidate_ids)
-        sql = f"""
-            SELECT 
-                r.id,
-                r.book_title,
-                r.subject,
-                r.mbbs_year,
-                r.chapter,
-                r.topic,
-                r.page_number,
-                r.physical_page,
-                r.total_pages,
-                r.content,
-                r.excerpt,
-                r.table_json
-            FROM medical_records r
-            WHERE r.id IN ({placeholders})
-        """
-        cursor.execute(sql, all_candidate_ids)
-        candidate_rows = cursor.fetchall()
+            placeholders = ','.join('?' for _ in all_candidate_ids)
+            sql = f"""
+                SELECT 
+                    r.id,
+                    r.book_title,
+                    r.subject,
+                    r.mbbs_year,
+                    r.chapter,
+                    r.topic,
+                    r.page_number,
+                    r.physical_page,
+                    r.total_pages,
+                    r.content,
+                    r.excerpt,
+                    r.table_json
+                FROM medical_records r
+                WHERE r.id IN ({placeholders})
+            """
+            cursor.execute(sql, all_candidate_ids)
+            candidate_rows = cursor.fetchall()
+        finally:
+            conn.close()
 
         # Filter by subject / year if requested
         filtered_rows = []
@@ -322,54 +347,75 @@ class MBBSHybridRetriever:
         for row in filtered_rows:
             rec_id = row["id"]
 
-            # RRF Component: w_sparse / (k + rank_sparse) + w_dense / (k + rank_dense)
-            sparse_component = (0.5 / (k_rrf + bm25_ranks[rec_id] + 1)) if rec_id in bm25_ranks else 0.0
-            dense_component = (0.5 / (k_rrf + dense_ranks[rec_id] + 1)) if rec_id in dense_ranks else 0.0
+            # RRF Component: balanced weights for sparse BM25 and dense KNN
+            sparse_component = (1.0 / (k_rrf + bm25_ranks[rec_id] + 1)) if rec_id in bm25_ranks else 0.0
+            dense_component = (1.0 / (k_rrf + dense_ranks[rec_id] + 1)) if rec_id in dense_ranks else 0.0
             rrf_score = sparse_component + dense_component
 
             # Dense similarity bonus
             dense_sim = dense_sims.get(rec_id, 0.0)
 
-            # Topic / Chapter term overlap bonus
-            doc_topic = f"{row['book_title']} {row['chapter']} {row['topic']}".lower()
+            # Topic term overlap bonus
+            doc_topic = f"{row['chapter']} {row['topic']}".lower()
             doc_content = (row['content'] or "").lower()
-            topic_counter = Counter(re.findall(r'\b\w+\b', doc_topic))
-            content_counter = Counter(re.findall(r'\b\w+\b', doc_content))
+            topic_words = set(re.findall(r'\b[a-zA-Z]{3,}\b', doc_topic))
 
-            topic_overlap = sum(min(query_counter[w], topic_counter[w]) * 4.0 for w in query_counter)
-            content_overlap = sum(min(query_counter[w], content_counter[w]) * 1.0 for w in query_counter)
-            norm = (math.sqrt(sum(query_counter[w]**2 for w in query_counter)) * 
-                    math.sqrt(sum(content_counter[w]**2 for w in content_counter) + 10) + 1e-6)
-            semantic_overlap = (topic_overlap + content_overlap) / norm
+            topic_overlap = sum(1 for w in query_counter if w in topic_words)
+            topic_bonus = min(topic_overlap * 0.006, 0.024)
+            dense_bonus = dense_sim * 0.025
 
-            combined_score = rrf_score + (dense_sim * 0.08) + (semantic_overlap * 0.08)
+            combined_score = rrf_score + dense_bonus + topic_bonus
 
-            # Intent-based clinical subject alignment
+            # Downweight low-content pages (e.g. figure captions, isolated diagram labels < 250 chars)
+            if len(doc_content.strip()) < 250 or row['topic'].lower().startswith(('fig', 'figure', 'table')):
+                combined_score *= 0.4
+
+            # Intent-based clinical subject alignment with balanced weighting
             q_lower = query.lower()
-            is_pediatric = any(k in q_lower for k in ["pediatric", "paediatric", "child", "children", "neonate", "neonatal", "infant", "newborn", "fontanelle", "baby"])
+            subject_weights = {}
 
+            # Pediatric intent
+            if any(k in q_lower for k in ["pediatric", "paediatric", "child", "children", "neonate", "neonatal", "infant", "newborn", "fontanelle", "baby"]):
+                subject_weights["Pediatrics"] = 1.35
+
+            # Clinical Medicine / Pathology intent
             if any(k in q_lower for k in [
                 "disease", "syndrome", "disorder", "pathology", "infarction", "ischemia", 
                 "stemi", "failure", "lesion", "management", "criteria", "meningitis", 
                 "infection", "fever", "headache", "dka", "stroke", "cirrhosis", "pneumonia", "aki"
             ]):
-                if is_pediatric:
-                    if row["subject"] == "Pediatrics":
-                        combined_score *= 2.2
-                else:
-                    if row["subject"] == "Internal Medicine":
-                        combined_score *= 2.2
-                    elif row["subject"] in ["Pharmacology", "Pathology", "General Surgery"]:
-                        combined_score *= 1.3
-            elif any(k in q_lower for k in ["nerve", "artery", "plexus", "canal", "boundaries", "relations", "triangle", "muscle", "branch", "fossa", "meninges", "bone", "joint"]):
-                if row["subject"] == "Anatomy":
-                    combined_score *= 2.0
-            elif any(k in q_lower for k in ["drug", "dose", "receptor", "antidote", "inhibitor", "blocker", "antibiotic", "side effect", "toxicity", "adverse", "regimen"]):
-                if row["subject"] == "Pharmacology":
-                    combined_score *= 2.0
-            elif any(k in q_lower for k in ["cycle", "normal", "resting", "mechanics", "filtration", "starling", "dissociation", "clearance"]):
-                if row["subject"] == "Physiology":
-                    combined_score *= 2.0
+                subject_weights["Internal Medicine"] = max(subject_weights.get("Internal Medicine", 1.0), 1.35)
+                subject_weights["Pathology"] = max(subject_weights.get("Pathology", 1.0), 1.25)
+                subject_weights["General Surgery"] = max(subject_weights.get("General Surgery", 1.0), 1.2)
+
+            # Pharmacology intent
+            if any(k in q_lower for k in [
+                "drug", "dose", "receptor", "antidote", "inhibitor", "blocker", "agonist", 
+                "antagonist", "antibiotic", "side effect", "toxicity", "adverse", "regimen", 
+                "pharmacokinetics", "mechanism of action"
+            ]):
+                subject_weights["Pharmacology"] = 1.35
+
+            # Physiology intent
+            if any(k in q_lower for k in [
+                "potential", "depolarization", "repolarization", "action potential", "conduction", 
+                "plateau", "refractory", "pacemaker", "cardiac cycle", "blood pressure", "transport", 
+                "osmosis", "diffusion", "filtration", "clearance", "mechanics", "homeostasis", 
+                "permeability", "starling", "dissociation", "secretion", "absorption"
+            ]):
+                subject_weights["Physiology"] = 1.35
+
+            # Anatomy intent (specific structural, relational, and topographical markers)
+            if any(k in q_lower for k in [
+                "origin", "insertion", "attachment", "boundaries", "relations", "triangle", 
+                "canal", "fossa", "sulcus", "foramen", "innervation", "course of", "branches of", 
+                "parts of", "borders of", "plexus", "fascia", "ligament", "articulation"
+            ]):
+                subject_weights["Anatomy"] = 1.35
+
+            # Apply subject alignment multiplier if matched
+            if row["subject"] in subject_weights:
+                combined_score *= subject_weights[row["subject"]]
 
             scored_records.append({
                 "record_id": row["id"],
@@ -386,7 +432,7 @@ class MBBSHybridRetriever:
                 "table_json": row["table_json"],
                 "bm25_score": round(bm25_scores.get(rec_id, 0.0), 4),
                 "dense_similarity": round(float(dense_sim), 4),
-                "semantic_score": round(float(semantic_overlap), 4),
+                "semantic_score": round(float(topic_bonus), 4),
                 "rrf_score": combined_score
             })
 
@@ -427,7 +473,6 @@ class MBBSHybridRetriever:
                 f"{item['book_title'].split(':')[0]} • p. {item['page_number']}"
             )
 
-        conn.close()
         return top_results
 
     def format_context_for_llm(self, evidence_list: List[Dict[str, Any]]) -> str:

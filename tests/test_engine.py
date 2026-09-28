@@ -25,12 +25,12 @@ from backend.engine.generator import MBBSGenerator
 
 def test_dense_embeddings_engine():
     embedder = MBBSEmbeddingEngine()
-    assert embedder.dim == 384, f"Expected 384 dimensions, got {embedder.dim}"
+    assert embedder.dim == 768, f"Expected 768 dimensions, got {embedder.dim}"
 
     # Query embedding test
     q_vec = embedder.embed_query("fibular neck fracture common peroneal nerve foot drop")
     assert isinstance(q_vec, np.ndarray)
-    assert q_vec.shape == (384,)
+    assert q_vec.shape == (768,)
     assert not np.all(q_vec == 0)
 
     # Document batch embedding test
@@ -40,9 +40,9 @@ def test_dense_embeddings_engine():
     ]
     doc_vecs = embedder.embed_documents(docs)
     assert len(doc_vecs) == 2
-    assert doc_vecs[0].shape == (384,)
-    assert doc_vecs[1].shape == (384,)
-    print("[PASS] Local FastEmbed 384-dim embedding engine verified.")
+    assert doc_vecs[0].shape == (768,)
+    assert doc_vecs[1].shape == (768,)
+    print("[PASS] Local PubMedBERT 768-dim biomedical embedding engine verified.")
 
 def test_textbook_indexing_and_vector_count():
     indexer = MBBSIndexer()
@@ -125,12 +125,44 @@ def test_grounded_generator_response():
     assert "Chaurasia" in first_cit["book_title"]
     print("[PASS] Grounded response generation with real textbook citations verified.")
 
+def test_extended_embeddings_length():
+    embedder = MBBSEmbeddingEngine()
+    long_passage = "Long bone osteology and microvascular architecture. " * 35  # ~1800 chars
+    prepared = embedder.prepare_passage_for_embedding("Anatomy Book", "Chapter 1", "Osteology", long_passage)
+    assert len(prepared) > 1200, f"Expected long passage to preserve extended context, got length {len(prepared)}"
+    print("[PASS] Extended passage embedding context (up to 2200 chars) verified.")
+
+def test_emergency_triage_detection():
+    generator = MBBSGenerator()
+    emergency_query = "Patient with crushing chest pain radiating to left arm and diaphoresis"
+    result = asyncio.run(generator.generate_response(query=emergency_query, provider="offline"))
+    assert "CLINICAL EMERGENCY / TRIAGE ALERT" in result["answer"]
+    assert "Acute Coronary Syndrome" in result["answer"]
+    print("[PASS] Emergency clinical red-flag triage alert verified.")
+
+def test_page_content_strict_lookup():
+    indexer = MBBSIndexer()
+    non_existent = indexer.get_page_content("NonExistentBookXYZ", 9999)
+    assert non_existent == {}, f"Expected empty result for non-existent page, got: {non_existent}"
+    print("[PASS] Strict page lookup (no silent fallback to arbitrary books) verified.")
+
+def test_sanitized_fts_query():
+    retriever = MBBSHybridRetriever()
+    # Complex query with quotes, asterisks, brackets that previously caused FTS5 syntax errors
+    results = retriever.search('test "query" *with* (nested) [brackets] AND OR NOT term', top_k=2)
+    assert isinstance(results, list)
+    print("[PASS] Sanitized FTS5 lexical query execution verified.")
+
 if __name__ == "__main__":
     test_dense_embeddings_engine()
+    test_extended_embeddings_length()
     test_textbook_indexing_and_vector_count()
     test_hybrid_dense_sparse_retrieval()
+    test_sanitized_fts_query()
     test_page_content_retrieval()
+    test_page_content_strict_lookup()
     test_grounded_generator_response()
+    test_emergency_triage_detection()
     print("\n" + "=" * 60)
     print("  ALL HYBRID DENSE-SPARSE RAG TESTS PASSED 100%!")
     print("=" * 60)

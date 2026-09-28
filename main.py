@@ -14,6 +14,8 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from backend.engine.indexer import MBBSIndexer
+from backend.app import app  # Expose top-level FastAPI instance for Vercel & ASGI runners
+
 
 def main():
     print("=" * 65)

@@ -7,10 +7,20 @@ import { MedicureUI } from "./ui.js";
 import { MedicureBookViewer } from "./book_viewer.js";
 
 // Storage helper for seamless continuity between Medicure and legacy keys
-const getStorage = (key) => localStorage.getItem(`medicure_${key}`) || localStorage.getItem(`medgemini_${key}`);
+// Storage helper for Medicure with legacy migration support
+const getStorage = (key) => {
+  const current = localStorage.getItem(`medicure_${key}`);
+  if (current !== null) return current;
+  const legacy = localStorage.getItem(`medgemini_${key}`);
+  if (legacy !== null) {
+    localStorage.setItem(`medicure_${key}`, legacy);
+    localStorage.removeItem(`medgemini_${key}`);
+    return legacy;
+  }
+  return null;
+};
 const setStorage = (key, val) => {
   localStorage.setItem(`medicure_${key}`, val);
-  localStorage.setItem(`medgemini_${key}`, val);
 };
 const removeStorage = (key) => {
   localStorage.removeItem(`medicure_${key}`);
@@ -309,8 +319,14 @@ class MedicureApp {
   updateModelStatusBadge(health = null) {
     if (!this.modelPillText || !this.modelStatusDot) return;
     const bookCount = (health && health.indexed_books_count !== undefined) ? health.indexed_books_count : 1;
+    const bookLabel = bookCount === 1 ? "1 Book" : `${bookCount} Books`;
+
     if (this.headerBookCount) {
       this.headerBookCount.textContent = bookCount;
+    }
+    const sidebarCountEl = document.getElementById("sidebar-book-count");
+    if (sidebarCountEl) {
+      sidebarCountEl.textContent = bookLabel;
     }
 
     if (this.settings.provider === "gemini") {
@@ -322,7 +338,6 @@ class MedicureApp {
       this.modelPillText.textContent = hasKey ? "Groq Cloud AI (Llama 3.3 70B)" : "Groq Cloud AI (Key Required)";
       this.modelStatusDot.style.backgroundColor = "#8b5cf6";
     } else {
-      const bookLabel = bookCount === 1 ? "1 Book" : `${bookCount} Books`;
       this.modelPillText.textContent = `Medicure Grounded Engine (${bookLabel})`;
       this.modelStatusDot.style.backgroundColor = "#10b981";
     }

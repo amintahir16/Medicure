@@ -115,13 +115,24 @@ export class MedicureBookViewer {
     this.nextBtn.disabled = this.currentPage >= this.totalPages;
 
     let content = data.content || "";
+    // HTML sanitize raw PDF text to protect against XSS
+    content = content
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
     
     // Highlight matching clinical statement if available
     if (this.currentExcerpt && this.currentExcerpt.trim().length > 15) {
       content = this._applySmartHighlight(content, this.currentExcerpt);
     }
 
-    this.viewerEl.innerHTML = content;
+    // Convert paragraph splits into structured paragraph blocks
+    const formattedHtml = content
+      .split(/\n\n+/)
+      .map(p => `<p style="margin-bottom:14px; line-height:1.65;">${p.replace(/\n/g, '<br>')}</p>`)
+      .join('');
+
+    this.viewerEl.innerHTML = formattedHtml || `<p>${content}</p>`;
 
     // Smoothly scroll the highlighted section into center view
     const markEl = this.viewerEl.querySelector("mark");

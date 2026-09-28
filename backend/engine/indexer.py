@@ -85,6 +85,11 @@ class MBBSIndexer:
 
             # Virtual Table for sqlite-vec dense vector search
             try:
+                cursor.execute("SELECT sql FROM sqlite_master WHERE name = 'medical_vectors'")
+                row = cursor.fetchone()
+                if row and f"float[{EMBEDDING_DIM}]" not in row["sql"]:
+                    cursor.execute("DROP TABLE IF EXISTS medical_vectors")
+
                 cursor.execute(f"""
                     CREATE VIRTUAL TABLE IF NOT EXISTS medical_vectors USING vec0(
                         record_id INTEGER PRIMARY KEY,
@@ -238,6 +243,26 @@ class MBBSIndexer:
         """
         with self.get_connection() as conn:
             cursor = conn.cursor()
+
+            # Check if existing embeddings match current EMBEDDING_DIM
+            cursor.execute("SELECT id, embedding FROM medical_records WHERE embedding IS NOT NULL LIMIT 1")
+            sample_row = cursor.fetchone()
+            if sample_row and sample_row["embedding"] and len(sample_row["embedding"]) != EMBEDDING_DIM * 4:
+                old_dim = len(sample_row["embedding"]) // 4
+                print(f"[*] Detected {old_dim}-dim embeddings in database. Migrating to {EMBEDDING_DIM}-dim PubMedBERT vectors...")
+                cursor.execute("UPDATE medical_records SET embedding = NULL")
+                cursor.execute("DROP TABLE IF EXISTS medical_vectors")
+                try:
+                    cursor.execute(f"""
+                        CREATE VIRTUAL TABLE medical_vectors USING vec0(
+                            record_id INTEGER PRIMARY KEY,
+                            embedding float[{EMBEDDING_DIM}]
+                        );
+                    """)
+                except Exception:
+                    pass
+                conn.commit()
+
             cursor.execute("""
                 SELECT id, book_title, chapter, topic, content 
                 FROM medical_records 
@@ -335,6 +360,13 @@ class MBBSIndexer:
         clean_title = re.sub(r'<[^>]+>', '', book_title).split('|')[0].strip()
         with self.get_connection() as conn:
             cursor = conn.cursor()
+            def _format_record(r):
+                if not r:
+                    return {}
+                d = dict(r)
+                d.pop("embedding", None)
+                return d
+
             # 1. Exact match by book_title and page
             cursor.execute("""
                 SELECT * FROM medical_records
@@ -343,7 +375,7 @@ class MBBSIndexer:
             """, (clean_title, page_number, page_number))
             row = cursor.fetchone()
             if row:
-                return dict(row)
+                return _format_record(row)
 
             # 2. Case-insensitive exact title match
             cursor.execute("""
@@ -353,7 +385,7 @@ class MBBSIndexer:
             """, (clean_title, page_number, page_number))
             row = cursor.fetchone()
             if row:
-                return dict(row)
+                return _format_record(row)
 
             # 3. Dynamic keyword match using title words (author name, distinctive terms)
             stopwords = {"the", "and", "of", "in", "for", "with", "principles", "textbook", "essentials", "clinical", "reference", "page", "basis"}
@@ -368,7 +400,7 @@ class MBBSIndexer:
                 """, (f"%{kw}%", page_number, page_number))
                 row = cursor.fetchone()
                 if row:
-                    return dict(row)
+                    return _format_record(row)
 
             # Try to match keyword with closest page
             for kw in title_words:
@@ -380,20 +412,18 @@ class MBBSIndexer:
                 """, (f"%{kw}%", page_number))
                 row = cursor.fetchone()
                 if row:
-                    return dict(row)
+                    return _format_record(row)
 
-            # 4. Fallback to any book partially matching title
+            # 4. Partial match on book title if within bounds
             cursor.execute("""
                 SELECT * FROM medical_records
                 WHERE LOWER(book_title) LIKE ?
-                ORDER BY page_number ASC
+                ORDER BY ABS(page_number - ?) ASC
                 LIMIT 1
-            """, (f"%{clean_title[:10].lower()}%",))
+            """, (f"%{clean_title[:10].lower()}%", page_number))
             row = cursor.fetchone()
             if row:
-                return dict(row)
+                return _format_record(row)
 
-            # 4. Fallback to first available record
-            cursor.execute("SELECT * FROM medical_records ORDER BY id ASC LIMIT 1")
-            row = cursor.fetchone()
-            return dict(row) if row else {}
+            # Never fallback to arbitrary unrelated records
+            return {}
