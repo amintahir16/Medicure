@@ -2,7 +2,7 @@
 Multi-Model Generator with Strict Medical Grounding and Citation Verification
 Supports:
 1. Google Gemini 2.0 Flash / 1.5 Flash (via free Google AI Studio key)
-2. Groq Llama 3.3 70B (via free Groq API key)
+2. Groq Cloud AI (OpenAI GPT-OSS 120B via free Groq API key)
 3. Built-in Grounded Offline Synthesis Engine (100% functional out-of-the-box)
 """
 
@@ -81,7 +81,7 @@ class MBBSGenerator:
                 "query": query,
                 "answer": (
                     "### ⚠️ Groq Cloud AI Key Required\n\n"
-                    "You have selected **Groq Cloud AI (Llama 3.3 70B)**, but no Groq API Key was provided.\n\n"
+                    "You have selected **Groq Cloud AI (OpenAI GPT-OSS 120B)**, but no Groq API Key was provided.\n\n"
                     "**How to connect:**\n"
                     "1. Click **⚙️ Model & API Settings** in the bottom left of the sidebar.\n"
                     "2. Paste your free Groq API key (starts with `gsk_...` from [console.groq.com](https://console.groq.com/keys)).\n"
@@ -124,7 +124,7 @@ class MBBSGenerator:
                 try:
                     greeting_prompt = (
                         f"The medical student or physician just said: '{query}'. "
-                        "Respond warmly, conversationally, and authoritatively as Medicure, the clinical AI medical tutor powered by Groq Cloud AI (Llama 3.3 70B). "
+                        "Respond warmly, conversationally, and authoritatively as Medicure, the clinical AI medical tutor powered by Groq Cloud AI (OpenAI GPT-OSS 120B). "
                         "Introduce yourself as an AI tutor strictly grounded across 5 full years of MBBS curriculum textbooks "
                         "(Anatomy, Physiology, Pathology, Pharmacology, Internal Medicine, General Surgery, Pediatrics). "
                         "Invite them to ask any clinical question, case vignette, or exam scenario with exact textbook page citations."
@@ -474,11 +474,11 @@ STRICT INSTRUCTIONS:
             else:
                 # Fallback hardcoded candidates if /models endpoint was unavailable
                 candidate_models.extend([
-                    "llama-3.3-70b-versatile",
-                    "llama-3.1-8b-instant",
                     "openai/gpt-oss-120b",
-                    "qwen/qwen3.6-27b",
-                    "openai/gpt-oss-20b"
+                    "openai/gpt-oss-20b",
+                    "qwen/qwen3.8-27b",
+                    "llama-3.3-70b-versatile",
+                    "llama-3.1-8b-instant"
                 ])
 
             models_to_try = list(dict.fromkeys(candidate_models))

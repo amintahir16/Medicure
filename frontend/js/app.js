@@ -335,7 +335,7 @@ class MedicureApp {
       this.modelStatusDot.style.backgroundColor = "#3b82f6";
     } else if (this.settings.provider === "groq") {
       const hasKey = !!this.settings.groqKey;
-      this.modelPillText.textContent = hasKey ? "Groq Cloud AI (Llama 3.3 70B)" : "Groq Cloud AI (Key Required)";
+      this.modelPillText.textContent = hasKey ? "Groq Cloud AI (OpenAI GPT-OSS 120B)" : "Groq Cloud AI (Key Required)";
       this.modelStatusDot.style.backgroundColor = "#8b5cf6";
     } else {
       this.modelPillText.textContent = `Medicure Grounded Engine (${bookLabel})`;

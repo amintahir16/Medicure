@@ -52,7 +52,7 @@ Medicure is powered by a **Hybrid Dense-Sparse RAG Engine** strictly grounded in
 7. **Multi-Model Support (Free Tiers & Offline)**:
    - **Medicure Grounded Engine (Offline)**: 100% functional out-of-the-box with zero configuration or external API key needed.
    - **Google Gemini 2.0 Flash / 1.5 Flash**: Deep clinical reasoning with 1M token context window via free Google AI Studio API key.
-   - **Groq Llama 3.3 70B**: Ultra-fast 300+ tok/s clinical inference via free Groq API key.
+   - **Groq Cloud AI (OpenAI GPT-OSS 120B)**: Ultra-fast 300+ tok/s clinical inference via free Groq API key.
 
 8. **Medical Student Study Modes**:
    - 🩺 **Standard Clinical Q&A**: Academic explanations with physiological mechanisms, diagrams, and comparison matrices.
@@ -186,5 +186,5 @@ Medicure is pre-configured for modern ASGI and serverless cloud deployment:
 2. Select your desired engine:
    - **Offline / Built-in Grounded Engine**: Works immediately with zero configuration (uses the pre-loaded *BD Chaurasia* and any user-uploaded textbooks).
    - **Google Gemini 2.0 Flash**: Obtain a free API key at [Google AI Studio](https://aistudio.google.com).
-   - **Groq Llama 3.3 70B**: Obtain a free API key at [Groq Console](https://console.groq.com).
+   - **Groq Cloud AI (OpenAI GPT-OSS 120B)**: Obtain a free API key at [Groq Console](https://console.groq.com).
 3. Paste the key and click **Save Settings**. Your key is stored securely in your browser session storage.

@@ -6,6 +6,7 @@ Completely local, offline-capable, and optimized for CPU inference with native M
 
 import os
 from typing import List, Union
+import numpy as np
 try:
     from sentence_transformers import SentenceTransformer
     HAS_SENTENCE_TRANSFORMERS = True
