@@ -553,7 +553,7 @@ class MedicureApp {
 
     let providerLabel = "📚 Grounded Engine";
     if (providerUsed === "groq" || providerUsed.toLowerCase().includes("groq")) {
-      providerLabel = "⚡ Groq Cloud";
+      providerLabel = "⚡ Groq (GPT-OSS 120B)";
     } else if (providerUsed === "gemini" || providerUsed.toLowerCase().includes("gemini")) {
       providerLabel = "✨ Gemini 2.0";
     }
