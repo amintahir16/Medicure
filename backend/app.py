@@ -37,7 +37,10 @@ async def lifespan(app: FastAPI):
     if new_books:
         print(f"Auto-indexed new textbooks: {list(new_books.keys())}")
     retriever.invalidate_cache()
-    print(f"Medicure Server ready. {len(indexer.get_books_summary())} MBBS books indexed.")
+    # Pre-warm local biomedical embeddings so user queries experience zero cold-start delay
+    print("[*] Pre-warming local PubMedBERT biomedical embedding model...")
+    await asyncio.to_thread(retriever.embedder.embed_query, "Medicure curriculum warmup")
+    print(f"Medicure Server ready. {len(indexer.get_books_summary())} MBBS books indexed and embedding engine warm.")
     yield
 
 app = FastAPI(

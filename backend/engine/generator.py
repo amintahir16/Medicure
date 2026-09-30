@@ -452,49 +452,57 @@ STRICT INSTRUCTIONS:
             "Content-Type": "application/json"
         }
 
-        async with httpx.AsyncClient(timeout=35.0) as client:
-            # 1. Dynamically retrieve currently active models for this Groq key
-            live_models = await self._get_available_groq_models(client, headers)
+        target_model = model or GROQ_MODEL or "openai/gpt-oss-120b"
 
-            # Build list of models to try in priority order
+        payload = {
+            "model": target_model,
+            "messages": [
+                {"role": "system", "content": MEDICAL_SYSTEM_PROMPT},
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": 0.1,
+            "max_tokens": 2048
+        }
+
+        async with httpx.AsyncClient(timeout=35.0) as client:
+            # Fast Path: Query the selected target model directly (no pre-flight overhead)
+            try:
+                resp = await client.post(url, json=payload, headers=headers)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    content = data["choices"][0]["message"]["content"]
+                    return content, target_model
+                elif resp.status_code == 401:
+                    err_json = resp.json() if "application/json" in resp.headers.get("content-type", "") else {}
+                    err_msg = err_json.get("error", {}).get("message", "Invalid API Key")
+                    raise Exception(f"Invalid Groq API Key (401): {err_msg}. Please check your key in Settings.")
+                elif resp.status_code == 429:
+                    err_json = resp.json() if "application/json" in resp.headers.get("content-type", "") else {}
+                    err_msg = err_json.get("error", {}).get("message", "Rate limit exceeded")
+                    raise Exception(f"Groq Rate Limit (429): {err_msg}")
+                else:
+                    print(f"[*] Primary Groq model '{target_model}' returned {resp.status_code}: {resp.text[:120]}")
+            except (httpx.HTTPStatusError, httpx.RequestError) as e:
+                print(f"[*] Primary Groq model '{target_model}' request error: {e}")
+
+            # Fallback Path: Only discover live models if primary model was unavailable
+            print(f"[*] Querying live Groq models fallback list...")
+            live_models = await self._get_available_groq_models(client, headers)
             candidate_models = []
-            if model and (not live_models or model in live_models):
-                candidate_models.append(model)
-            
-            # If live models were retrieved, prioritize the best available chat models
             if live_models:
-                # Rank: 120b, 70b, 27b, 8b, others
-                for rank_kw in ["120b", "70b", "27b", "8b"]:
+                for rank_kw in ["120b", "20b", "27b", "70b"]:
                     for lm in live_models:
-                        if rank_kw in lm.lower() and lm not in candidate_models:
+                        if rank_kw in lm.lower() and lm not in candidate_models and lm != target_model:
                             candidate_models.append(lm)
                 for lm in live_models:
-                    if lm not in candidate_models:
+                    if lm not in candidate_models and lm != target_model:
                         candidate_models.append(lm)
             else:
-                # Fallback hardcoded candidates if /models endpoint was unavailable
-                candidate_models.extend([
-                    "openai/gpt-oss-120b",
-                    "openai/gpt-oss-20b",
-                    "qwen/qwen3.8-27b",
-                    "llama-3.3-70b-versatile",
-                    "llama-3.1-8b-instant"
-                ])
-
-            models_to_try = list(dict.fromkeys(candidate_models))
-            print(f"[*] Groq models to try in order: {models_to_try}")
+                candidate_models = ["openai/gpt-oss-20b", "qwen/qwen3.8-27b", "llama-3.3-70b-versatile"]
 
             last_error = None
-            for m in models_to_try:
-                payload = {
-                    "model": m,
-                    "messages": [
-                        {"role": "system", "content": MEDICAL_SYSTEM_PROMPT},
-                        {"role": "user", "content": prompt}
-                    ],
-                    "temperature": 0.1,
-                    "max_tokens": 2048
-                }
+            for m in candidate_models:
+                payload["model"] = m
                 try:
                     resp = await client.post(url, json=payload, headers=headers)
                     if resp.status_code == 200:
@@ -502,26 +510,16 @@ STRICT INSTRUCTIONS:
                         content = data["choices"][0]["message"]["content"]
                         return content, m
                     elif resp.status_code == 401:
-                        err_json = resp.json() if "application/json" in resp.headers.get("content-type", "") else {}
-                        err_msg = err_json.get("error", {}).get("message", "Invalid API Key")
-                        raise Exception(f"Invalid Groq API Key (401): {err_msg}. Please check your key in Settings.")
+                        raise Exception("Invalid Groq API Key (401)")
                     elif resp.status_code == 429:
-                        err_json = resp.json() if "application/json" in resp.headers.get("content-type", "") else {}
-                        err_msg = err_json.get("error", {}).get("message", "Rate limit exceeded")
-                        raise Exception(f"Groq Rate Limit (429): {err_msg}")
-                    else:
-                        err_text = resp.text
-                        print(f"[*] Groq model '{m}' failed ({resp.status_code}): {err_text}")
-                        last_error = f"Model {m} error ({resp.status_code}): {err_text[:150]}"
                         continue
-                except httpx.HTTPStatusError as e:
-                    last_error = str(e)
-                    continue
-                except httpx.RequestError as e:
+                    else:
+                        last_error = f"Model {m} error ({resp.status_code}): {resp.text[:120]}"
+                except Exception as e:
                     last_error = str(e)
                     continue
 
-        raise Exception(f"Groq request failed: {last_error}")
+        raise Exception(f"Groq request failed: {last_error or 'No available model responded'}")
 
     def _clean_page_text(self, raw_text: str) -> str:
         """Strips running headers, chapter titles, page labels, and broken figure references."""
