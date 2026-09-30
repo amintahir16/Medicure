@@ -88,6 +88,10 @@ class MedicureApp {
     this.providerRadios = document.querySelectorAll("input[name='llm-provider']");
     this.geminiKeyInput = document.getElementById("gemini-key-input");
     this.groqKeyInput = document.getElementById("groq-key-input");
+    this.toggleGeminiKeyBtn = document.getElementById("toggle-gemini-key-btn");
+    this.copyGeminiKeyBtn = document.getElementById("copy-gemini-key-btn");
+    this.toggleGroqKeyBtn = document.getElementById("toggle-groq-key-btn");
+    this.copyGroqKeyBtn = document.getElementById("copy-groq-key-btn");
 
     this.libraryModal = document.getElementById("library-modal");
     this.libraryBtn = document.getElementById("library-btn");
@@ -192,6 +196,49 @@ class MedicureApp {
     this.settingsBtn.addEventListener("click", () => this.openSettingsModal());
     this.closeSettingsBtn.addEventListener("click", () => this.settingsModal.classList.remove("active"));
     this.saveSettingsBtn.addEventListener("click", () => this.saveSettings());
+
+    // API Key Reveal & Copy Buttons
+    if (this.toggleGroqKeyBtn) {
+      this.toggleGroqKeyBtn.addEventListener("click", () => {
+        const isPassword = this.groqKeyInput.type === "password";
+        this.groqKeyInput.type = isPassword ? "text" : "password";
+        this.toggleGroqKeyBtn.textContent = isPassword ? "🙈" : "👁️";
+      });
+    }
+
+    if (this.copyGroqKeyBtn) {
+      this.copyGroqKeyBtn.addEventListener("click", () => {
+        const key = this.groqKeyInput.value.trim();
+        if (!key) {
+          this.showToast("⚠️ No Groq API Key to copy", "error");
+          return;
+        }
+        navigator.clipboard.writeText(key).then(() => {
+          this.showToast("📋 Copied Groq API Key to clipboard!", "info");
+        });
+      });
+    }
+
+    if (this.toggleGeminiKeyBtn) {
+      this.toggleGeminiKeyBtn.addEventListener("click", () => {
+        const isPassword = this.geminiKeyInput.type === "password";
+        this.geminiKeyInput.type = isPassword ? "text" : "password";
+        this.toggleGeminiKeyBtn.textContent = isPassword ? "🙈" : "👁️";
+      });
+    }
+
+    if (this.copyGeminiKeyBtn) {
+      this.copyGeminiKeyBtn.addEventListener("click", () => {
+        const key = this.geminiKeyInput.value.trim();
+        if (!key) {
+          this.showToast("⚠️ No Gemini API Key to copy", "error");
+          return;
+        }
+        navigator.clipboard.writeText(key).then(() => {
+          this.showToast("📋 Copied Gemini API Key to clipboard!", "info");
+        });
+      });
+    }
 
     // Library Modal
     this.libraryBtn.addEventListener("click", () => this.openLibraryModal());

@@ -272,7 +272,13 @@
 
           <div class="settings-group">
             <label class="settings-label">Google Gemini API Key (Optional)</label>
-            <input type="password" id="gemini-key-input" class="settings-input" placeholder="AIzaSy... (Get free at aistudio.google.com)" autocomplete="new-password">
+            <div class="key-input-wrapper">
+              <input type="password" id="gemini-key-input" class="settings-input" placeholder="AIzaSy... (Get free at aistudio.google.com)" autocomplete="new-password">
+              <div class="key-input-actions">
+                <button type="button" class="key-action-btn" id="toggle-gemini-key-btn" title="Show / Hide Key">👁️</button>
+                <button type="button" class="key-action-btn" id="copy-gemini-key-btn" title="Copy Key to Clipboard">📋</button>
+              </div>
+            </div>
             <span style="font-size:0.72rem; color:var(--text-muted);">
               Stored locally in your browser. Leave blank to use the built-in offline grounded engine.
             </span>
@@ -280,7 +286,13 @@
 
           <div class="settings-group">
             <label class="settings-label">Groq API Key (Optional)</label>
-            <input type="password" id="groq-key-input" class="settings-input" placeholder="gsk_... (Get free at console.groq.com)" autocomplete="new-password">
+            <div class="key-input-wrapper">
+              <input type="password" id="groq-key-input" class="settings-input" placeholder="gsk_... (Get free at console.groq.com)" autocomplete="new-password">
+              <div class="key-input-actions">
+                <button type="button" class="key-action-btn" id="toggle-groq-key-btn" title="Show / Hide Key">👁️</button>
+                <button type="button" class="key-action-btn" id="copy-groq-key-btn" title="Copy Key to Clipboard">📋</button>
+              </div>
+            </div>
             <span style="font-size:0.72rem; color:var(--text-muted);">
               Stored locally in your browser. Enables high-speed conversational reasoning across textbooks.
             </span>
